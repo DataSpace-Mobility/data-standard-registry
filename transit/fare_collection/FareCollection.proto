@@ -1,0 +1,137 @@
+// MIT License
+
+// Copyright (c) 2020 The Ministry of Housing and Urban Affairs
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+package fare_collection;
+option java_package = "in.gov.mohua.ds.transit";
+
+import "../../common/Header.proto";
+
+message FeedMessage {
+    // Metadata
+    Header header = 1;
+
+    
+    repeated TransitSystem transitSystem = 2;
+}
+
+message TransitSystem {
+    string id = 1;
+    string name = 2;
+    repeated TicketIssued ticketsIssued = 3;
+}
+
+message TicketIssued {
+    string tripId = 1;
+    TicketTransaction ticketTransaction = 2;
+    Gate entry = 3;
+    repeated Gate interchanges = 4;
+    Gate exit = 5;
+}
+
+message TicketTransaction {
+
+    // Indicates the specific physical/digital  form of the ticket.
+    enum TicketType {
+        TICKET_TYPE_UNKNOWN = 0;
+        TICKET_TYPE_PAPER = 1;
+        TICKET_TYPE_TOKEN = 2;
+        TICKET_TYPE_TRAVEL_CARD = 3;
+        TICKET_TYPE_MOBILE = 4;
+    }
+
+    // In case the TIcket Type is a Travel Card, indicates the 
+    // specific typology of it. 
+    enum TravelCardType {
+        TRAVEL_CARD_TYPE_UNKNOWN = 0;
+        TRAVEL_CARD_TYPE_WALLET = 1;
+        TRAVEL_CARD_TYPE_NCMC = 2;
+    }
+
+    // Specifies the financial mechanism used by the user to 
+    // acquire the specific ticket.
+    enum ModeOfPayment {
+        MODE_OF_PAYMENT_UNKNOWN = 0;
+        MODE_OF_PAYMENT_CASH = 1;
+        MODE_OF_PAYMENT_DEBIT_CARD = 2;
+        MODE_OF_PAYMENT_CREDIT_CARD = 3;
+        MODE_OF_PAYMENT_WALLET = 4;
+        MODE_OF_PAYMENT_UPI = 5;
+        MODE_OF_PAYMENT_COUPON = 6;
+        MODE_OF_PAYMENT_TRAVEL_CARD = 7;
+    }
+
+    // Indicates if the ticket purchase transaction was performed 
+    // at the boarding station or directly on the mode of transport.
+    enum TicketIssueLocation {
+        TICKET_ISSUE_LOCATION_UNKNOWN = 0;
+        TICKET_ISSUE_LOCATION_ONBOARD = 1;
+        TICKET_ISSUE_LOCATION_STATION = 2;
+    }
+
+    // Indicates the vending mechanism utilised to perform 
+    // the transaction and issue the specific ticket.
+    enum TicketVendorType {
+        TICKET_VENDOR_TYPE_UNKNOWN = 0;
+        TICKET_VENDOR_TYPE_ONLINE = 1;
+        TICKET_VENDOR_TYPE_MACHINE = 2;
+        TICKET_VENDOR_TYPE_KIOSK = 3;
+        TICKET_VENDOR_TYPE_CONDUCTOR = 4;
+    }
+
+    // Identifies the final fare charged to the user, 
+    // specifying the various sub-prices accordingly 
+    // with the fare structure utilised. 
+    message Fare {
+        float baseFare = 1;
+        float surchargeFare = 2;
+        float waitingFare = 3;
+        float commissionfare = 4;
+        float taxes = 5;
+        float penalties = 6;
+        float finalFare = 7;
+    }
+
+    string id = 1;
+    string cardId = 2;
+    uint64 timestamp = 3;
+    TicketType ticketType = 4;
+    TravelCardType travelCardType = 5;
+    ModeOfPayment modeOfPayment = 6;
+    TicketIssueLocation ticketIssueLocation = 7;
+    TicketVendorType ticketVendorType = 8;
+    Fare fare = 9;
+}
+
+/* message TravelCardInfo {
+    string cardId = 1;
+    string travelCardType = 2;
+} */
+
+// Identifies the different parameters with which the user enter/exit the station and/or mode or transport 
+// with the purchased ticket. Hence, the trip is finalised and the validity of the ticket expired.
+message Gate {
+    string gateId = 1;
+    string stationId = 2;
+    uint64 timestamp = 3;
+    string ticketValidator = 4;
+}
