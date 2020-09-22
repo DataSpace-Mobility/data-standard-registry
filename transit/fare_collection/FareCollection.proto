@@ -24,7 +24,7 @@ syntax = "proto3";
 package fare_collection;
 option java_package = "in.gov.mohua.ds.transit";
 
-import "../../common/Header.proto";
+import "Header.proto";
 
 message FeedMessage {
     // Metadata
