@@ -33,86 +33,145 @@ message FeedMessage {
     
     repeated TransitSystem transitSystem = 2;
 }
-
+// Specifies the mode of transport issuing the unique ticket. 
 message TransitSystem {
+    // Unique identification number for the TransitSystem.
     string id = 1;
+    // Name of the specific TransitSystem.
     string name = 2;
     repeated TicketIssued ticketsIssued = 3;
 }
-
+// Specifies how a unique ticket was used to perform a commute. 
 message TicketIssued {
+    // Unique identification number for each trip.
     string tripId = 1;
     TicketTransaction ticketTransaction = 2;
+    // Indicates the gate used by the specific user to access the station/mode 
+    // of transport.
     Gate entry = 3;
+    // In case the user interchanged modes of transport at a station, adds a 
+    // Gate.
     repeated Gate interchanges = 4;
+    // Indicates the gate used by the specific user to exit the station/mode 
+    // of transport.
     Gate exit = 5;
 }
-
+// Specifies how a unique ticket was adquired by a user.
 message TicketTransaction {
 
     // Indicates the specific physical/digital  form of the ticket.
     enum TicketType {
+        // The specific physical/digital  form of the ticket is not 
+        // known/inputed.
         TICKET_TYPE_UNKNOWN = 0;
+        // The physical form of the ticket is printed on paper.
         TICKET_TYPE_PAPER = 1;
+        // The physical form of the ticket is an electronic token. 
         TICKET_TYPE_TOKEN = 2;
+        // The physical form of the ticket is a travel card (any form).
         TICKET_TYPE_TRAVEL_CARD = 3;
+        // Includes any digital ticket form (OPT, codebar, QR, etc.).
         TICKET_TYPE_MOBILE = 4;
     }
 
-    // In case the TicketType is a TravelCard, indicates the 
-    // specific typology of it. 
+    // In case the TicketType is a TravelCard, indicates the specific typology 
+    // of it. 
     enum TravelCardType {
+        // The specific typology of the TravelCard is not known/inputed. 
         TRAVEL_CARD_TYPE_UNKNOWN = 0;
+        // The TravelCard is a rechargable wallet.
         TRAVEL_CARD_TYPE_WALLET = 1;
+        // The TravelCard is a National Common Mobility Card.
         TRAVEL_CARD_TYPE_NCMC = 2;
     }
 
-    // Specifies the financial mechanism used by the user to 
-    // acquire the specific ticket.
+    // Specifies the financial mechanism used by the user to acquire the 
+    // specific ticket.
     enum ModeOfPayment {
+        // The specific ModeOfPayment used to make the transaction is not 
+        // known/inputed.
         MODE_OF_PAYMENT_UNKNOWN = 0;
+        // The transaction was made utilising cash (physical bills and/or 
+        // coins).
         MODE_OF_PAYMENT_CASH = 1;
+        // The transaction was made utilising a bank issued debit card 
+        // (any type).
         MODE_OF_PAYMENT_DEBIT_CARD = 2;
+        // The transaction was made utilising a bank issued credit card 
+        // (any type).
         MODE_OF_PAYMENT_CREDIT_CARD = 3;
+        // The transaction was made utilising a digital wallet (any type).
         MODE_OF_PAYMENT_WALLET = 4;
+        // The transaction was made utilising a Unified Payments Interface 
+        // (any type).
         MODE_OF_PAYMENT_UPI = 5;
+        // The transaction was made utilising a digital/physical 
+        // coupon/voucher (any type).
         MODE_OF_PAYMENT_COUPON = 6;
+         // The transaction was made utilising a TravelCard as mode of payment
+         // (any type).
         MODE_OF_PAYMENT_TRAVEL_CARD = 7;
     }
 
     // Indicates if the ticket purchase transaction was performed 
     // at the boarding station or directly on the mode of transport.
     enum TicketIssueLocation {
+        // The specific location of where the ticket was issued is not 
+        // known/inputed.
         TICKET_ISSUE_LOCATION_UNKNOWN = 0;
+        // The ticket was issued onboard the mode of transport (any type).
         TICKET_ISSUE_LOCATION_ONBOARD = 1;
+        // The ticket was issued prior onboarding on the station (any type).
         TICKET_ISSUE_LOCATION_STATION = 2;
     }
 
-    // Indicates the vending mechanism utilised to perform 
-    // the transaction and issue the specific ticket.
+    // Indicates the vending mechanism utilised to perform the transaction and
+    // issue the specific ticket.
     enum TicketVendorType {
+        // The specific typology of the vending mechanism that issued the 
+        // ticket is not known/inputed.
         TICKET_VENDOR_TYPE_UNKNOWN = 0;
+        // The ticket was issued via an online platform (website, mobile 
+        // application, software).
         TICKET_VENDOR_TYPE_ONLINE = 1;
+        // The ticket was issued via a physical ticketing machine (any type).
         TICKET_VENDOR_TYPE_MACHINE = 2;
+        // The ticket was issued via a physical ticketing kiosk (inside or 
+        // outside the station).
         TICKET_VENDOR_TYPE_KIOSK = 3;
+         // The ticket was issued by the conductor onboard the specific mode 
+         // of transport (any type).
         TICKET_VENDOR_TYPE_CONDUCTOR = 4;
     }
 
-    // Identifies the final fare charged to the user, 
-    // specifying the various sub-prices accordingly 
+    // Identifies the final fare charged to the user, specifying the various 
+    // sub-prices accordingly 
     // with the fare structure utilised. 
     message Fare {
+        // Indicates the regular charge.
         float baseFare = 1;
+        // Indicates any additional charge(s) (any type) on top of the 
+        // baseFare, if applicable.
         float surchargeFare = 2;
+        // Indicates any additional charge(s) as a result of waiting times, 
+        // if applicable.
         float waitingFare = 3;
+        // Indicates any additional booking charge(s), if applicable.
         float commissionFare = 4;
+        // Indicates all the applicable taxes (any type), if applicable.
         float taxes = 5;
+        // Indicates any additional penalty(ies), if applicable.
         float penalties = 6;
+        // By adding all the aforementioned, indicates the final price paid 
+        // by the user . 
         float finalFare = 7;
     }
 
+    // Unique identification number for each ticket issued.
     string id = 1;
+    // Unique identification number for each TravelCard.
     string cardId = 2;
+    // Specific time of purchase of a unique ticket.
     uint64 timestamp = 3;
     TicketType ticketType = 4;
     TravelCardType travelCardType = 5;
@@ -122,11 +181,16 @@ message TicketTransaction {
     Fare fare = 9;
 }
 
-// Identifies the different parameters with which the user enter/exit the station and/or mode or transport 
-// with the purchased ticket. Hence, the trip is finalised and the validity of the ticket expired.
+// Identifies the different parameters with which the user enter/exit the 
+// station and/or mode or transport with the purchased ticket. Hence, the 
+// trip is finalised and the validity of the ticket expired.
 message Gate {
+     // Unique identification number for each gate.
     string gateId = 1;
+     // Unique identification number for each station.
     string stationId = 2;
+    // Specific time of enter/exit of a user.
     uint64 timestamp = 3;
+    // The specific typology of the mechanism that validate a unique ticket.
     string ticketValidator = 4;
 }
