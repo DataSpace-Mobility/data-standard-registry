@@ -1,434 +1,606 @@
-// Copyright 2012 Google Inc., Stichting OpenGeo
-//
-// The content of this file is licensed under the Creative Commons Attribution
-// 3.0 License.
-//
-// Protocol definition file for a GTFS feed.
+// Copyright (c) 2020-2021 Google Inc, Ministry of Housing and Urban Affairs, National Institute of Urban Affairs
 
-syntax = "proto2";
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
 
-option java_package = "com.google.transit.planned";
-package transit_planned;
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+syntax = "proto3";
+
+option java_package = "com.google.transit.static";
+package transit_static;
 
 message FeedMessage {
-  // Metadata about this feed and feed message.
-  required FeedHeader header = 1;
 
-  // Contents of the feed.
-  repeated FeedEntity entity = 2;
+	FeedHeader header = 1;
+
+	// Transit agencies with service represented in this dataset.
+	repeated Agency agency = 2;
+	// Stops where vehicles pick up or drop off riders. Also defines stations and station entrances.
+	repeated Stop stops = 3;
+	// Transit routes. A route is a group of trips that are displayed to riders as a single service.
+	repeated Route routes = 4;
+	// Trips for each route. A trip is a sequence of two or more stops that occur during a specific time period.
+	repeated Trip trips = 5;
+	// Times that a vehicle arrives at and departs from stops for each trip.
+	repeated StopTime stop_times = 6;
+	// Service dates specified using a weekly schedule with start and end dates. This file is required unless all dates of service are defined in calendar_dates.txt.
+	repeated CalendarEntry calendar = 7;
+	// Exceptions for the services defined in the calendar.txt. If calendar.txt is omitted, then calendar_dates.txt is required and must contain all dates of service.
+	repeated CalendarDateEntry calendar_dates = 8;
+	// Fare information for a transit agency's routes.
+	repeated FareAttribute fare_attributes = 9;
+	// Rules to apply fares for itineraries.
+	repeated FareRule fare_rules = 10;
+	// Rules for mapping vehicle travel paths, sometimes referred to as route alignments.
+	repeated Shape shapes = 11;
+	// Headway (time between trips) for headway-based service or a compressed representation of fixed-schedule service.
+	repeated FrequencyEntry frequencies= 12;
+	// Rules for making connections at transfer points between routes.
+	repeated Transfer transfers = 13;
+	// Pathways linking together locations within stations.
+	repeated Pathway pathways = 14;
+	// Levels within stations.
+	repeated Level levels = 15;
+	// Dataset metadata, including publisher, version, and expiration information.
+	repeated FeedInfoEntry feed_info = 16;
+	// Translated information of a transit agency.
+	repeated Translation translations = 17;
+	// Specifies the attributions that are applied to the dataset.
+	repeated Attribution attributions = 18;
 }
 
 // Metadata about a feed, included in feed messages.
 message FeedHeader {
-  // Version of the feed specification.
-  // The current version is 1.0.
-  required string gtfs_version = 1;
-
-  // The feed_publisher_name field contains the full name of the organization that publishes the feed.
-  required string feed_publisher_name = 2;
-
-  // The feed_publisher_url field contains the URL of the feed publishing organization's website.
-  required string feed_publisher_url = 3;
-
-  // The feed_lang field contains a IETF BCP 47 language code specifying the default language used for the text in this feed. 
-  required string feed_lang = 4;
-
-  // The feed provides complete and reliable schedule information for service in the period from the beginning of the
-  // feed_start_date day to the end of the feed_end_date day in YYYYMMDD
-  optional string feed_start_date = 5;
-  optional string feed_end_date = 6;
-  
-  // The feed publisher can specify a string here that indicates the current version of their GTFS feed.
-  optional string feed_version = 7;
-
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+	string gtfs_version = 1;
+	// Last update timestamp.
+  	uint64 last_updated_on = 2;
 }
-
-// A definition (or update) of an entity in the transit feed.
-message FeedEntity {
-  // The ids are used only to provide incrementality support. The id should be
-  // unique within a FeedMessage. Consequent FeedMessages may contain
-  // FeedEntities with the same id. In case of a DIFFERENTIAL update the new
-  // FeedEntity with some id will replace the old FeedEntity with the same id
-  // (or delete it - see is_deleted below).
-  // The actual GTFS entities (e.g. stations, routes, trips) referenced by the
-  // feed must be specified by explicit selectors (see EntitySelector below for
-  // more info).
-  required string id = 1;
-
-  // Whether this entity is to be deleted. Relevant only for incremental
-  // fetches.
-  optional bool is_deleted = 2 [default = false];
-
-  // Data about the entity itself. Exactly one of the following fields must be
-  // present (unless the entity is being deleted).
-  optional Agency agency = 3;
-  optional Stops stops = 4;
-  optional Routes routes = 5;
-  optional Trips trips = 6;
-  optional StopTimes stop_times = 7;
-  optional Calendar calendar = 8;
-  optional CalendarDates calendar_dates = 9;
-  optional FareAttributes fare_attributes = 10;
-  optional FareRules fare_rules = 11;
-  optional Shapes shapes = 12;
-  optional Frequencies frequencies= 13;
-  optional Transfers transfers = 14;
-
-  extensions 1000 to 1999;
-}
-
-//
-// Entities used in the feed.
-//
 
 message Agency {
-  // The agency_id field is an ID that uniquely identifies a transit agency.
-  optional string agency_id = 1;
-
-  // The agency_name field contains the full name of the transit agency.
-  required string agency_name = 2;
-
-  // The agency_url field contains the URL of the transit agency.
-  required string agency_url = 3;
-
-  // The agency_timezone field contains the timezone where the transit agency is located.
-  required string agency_timezone = 4;
-
-  // The agency_lang field contains a two-letter ISO 639-1 code for the primary language used by this transit agency.
-  optional string agency_lang = 5;
-
-  // The agency_phone field contains a single voice telephone number for the specified agency.
-  optional string agency_phone = 6;
-
-  // The agency_fare_url specifies the URL of a web page that allows a rider to purchase tickets or other fare instruments for that agency online. 
-  optional string agency_fare_url = 7;
-  
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+    // Identifies a transit brandwhich is often synonymous with a transit agency. Note that in some cases, such as when a single agency operates multiple separate services, agencies and brands are distinct. This document uses the term "agency" in place of "brand". A dataset may contain data from multiple agencies. This field is required when the dataset contains data for multiple transit agencies, otherwise it is optional.
+    string agency_id = 1;
+    // Full name of the transit agency.
+    string agency_name = 2;
+    // URL of the transit agency.
+    string agency_url = 3;
+    // Timezone where the transit agency is located. If multiple agencies are specified in the dataset, each must have the same `agency_timezone`.
+    string agency_timezone = 4;
+    // Primary language used by this transit agency. This field helps GTFS consumers choose capitalization rules and other language-specific settings for the dataset.
+    string agency_lang = 5;
+    // A voice telephone number for the specified agency. This field is a string value that presents the telephone number as typical for the agency's service area. It can and should contain punctuation marks to group the digits of the number. Dialable text (for example, TriMet's 503-238-RIDE) is permitted, but the field must not contain any other descriptive text.
+    string agency_phone = 6;
+    // URL of a web page that allows a rider to purchase tickets or other fare instruments for that agency online.
+    string agency_fare_url = 7;
+    // Email address actively monitored by the agency’s customer service department. This email address should be a direct contact point where transit riders can reach a customer service representative at the agency.
+    string agency_email = 8;
 }
 
-message Stops {
-  // The stop_id field contains an ID that uniquely identifies a stop or station.
-  // Multiple routes may use the same stop. stop_id is dataset unique.
-  required string stop_id = 1;
-
-  // The stop_code field contains short text or a number that uniquely identifies the stop for passengers.
-  optional string stop_code = 2;
-
-  // The stop_name field contains the name of a stop or station.
-  required string stop_name = 3;
-
-  // The stop_desc field contains a description of a stop.
-  optional string stop_desc = 4;
-
-  // Degrees North, in the WGS-84 coordinate system.
-  required float latitude = 5;
-
-  // Degrees East, in the WGS-84 coordinate system.
-  required float longitude = 6;
-
-  optional string zone_id = 7;
-  optional string stop_url = 8;
-  enum LocationType {
-    // A location where passengers board or disembark from a transit vehicle.
-    STOP = 0;
-
-    // A physical structure or area that contains one or more stop.
-    STATION= 1;
-  }
-  optional LocationType location_type = 9 [default = STOP];
-
-  optional string parent_station = 10;
-  required string agency_timezone = 11;
-  
-  enum WheelchairBoarding {
-    // no accessibility information for the stop
-    UNKNOWN = 0;
-
-    // some vehicles at this stop can be boarded by a rider in a wheelchair
-    ACCESSIBLE = 1;
-
-    // wheelchair boarding is not possible at this stop
-    NOT_ACCESSIBLE = 2;
-  }
-  // The exact status of the vehicle with respect to the current stop.
-  // Ignored if current_stop_sequence is missing.
-  optional WheelchairBoarding wheelchair_boarding = 12 [default = UNKNOWN];
-
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+message Stop {
+	// Identifies a stop, station, or station entrance. 
+	// The term "station entrance" refers to both station entrances and station exits. Stops, stations or station entrances are collectively referred to as locations. Multiple routes may use the same stop.
+	string stop_id = 1;
+	// Short text or a number that identifies the location for riders. These codes are often used in phone-based transit information systems or printed on signage to make it easier for riders to get information for a particular location. The stop_code can be the same as stop_id if it is public facing. This field should be left empty for locations without a code presented to riders.
+	string stop_code = 2;
+	// The stop_name field contains the name of a stop or station.
+	string stop_name = 3;
+	// The stop_desc field contains a description of a stop.
+	string stop_desc = 4;
+	// Degrees North, in the WGS-84 coordinate system.
+	float stop_lat = 5;
+	// Degrees East, in the WGS-84 coordinate system.
+	float stop_lon = 6;
+	// Identifies the fare zone for a stop. This field is required if providing fare information using fare_rules.txt, otherwise it is optional. If this record represents a station or station entrance, the zone_id is ignored.
+	string zone_id = 7;
+	// URL of a web page about the location. This should be different from the agency.agency_url and the routes.route_url field values.
+	string stop_url = 8;
+	enum LocationType {
+		// Stop (or Platform). A location where passengers board or disembark from a transit vehicle. Is called a platform when defined within a parent_station.
+		STOP = 0;
+		// A physical structure or area that contains one or more platform.
+		STATION = 1;
+		// A location where passengers can enter or exit a station from the street. If an entrance/exit belongs to multiple stations, it can be linked by pathways to both, but the data provider must pick one of them as parent.
+		ENTRANCE_EXIT = 2;
+		// A location within a station, not matching any other location_type, which can be used to link together pathways define in pathways.txt.
+		GENERIC_NODE = 3;
+		// A specific location on a platform, where passengers can board and/or alight vehicles.
+		BOARDING_AREA = 4;
+	}
+	// Type of the location
+	LocationType location_type = 9;
+	// Defines hierarchy between the different locations defined in stops.txt.
+	string parent_station = 10;
+	// Timezone of the location.
+	string agency_timezone = 11;
+	
+	enum WheelchairBoarding {
+		// no accessibility information for the stop
+		UNKNOWN = 0;
+		// some vehicles at this stop can be boarded by a rider in a wheelchair
+		ACCESSIBLE = 1;
+		// wheelchair boarding is not possible at this stop
+		NOT_ACCESSIBLE = 2;
+	}
+	// The exact status of the vehicle with respect to the current stop.
+	// Ignored if current_stop_sequence is missing.
+	WheelchairBoarding wheelchair_boarding = 12;
+	// Level of the location. The same level can be used by multiple unlinked stations.
+	string level_id = 13;
+	// Platform identifier for a platform stop (a stop belonging to a station). This should be just the platform identifier (eg. G or 3). Words like "platform" or "track" (or the feed’s language-specific equivalent) should not be included. This allows feed consumers to more easily internationalize and localize the platform identifier into other languages.
+	string platform_code = 14;
 }
 
-message Routes {
-  // The route_id field contains an ID that uniquely identifies a route.
-  // The route_id is dataset unique.
-  required string route_id = 1;
-
-  // The agency_id field defines an agency for the specified route. 
-  optional string agency_id = 2;
-
-  // The route_short_name contains the short name of a route.
-  required string route_short_name = 3;
-
-  // The route_long_name contains the full name of a route.
-  required string route_long_name = 4;
-
-  // The route_desc field contains a description of a route. 
-  required string route_desc = 5;
-
-  // The route_type field describes the type of transportation used on a route.
-  enum RouteType {
-    // Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
-    TRAM = 0;
-
-    // Subway, Metro. Any underground rail system within a metropolitan area.
-    SUBWAY = 1;
-
-    // Rail. Used for intercity or long-distance travel.
-    RAIL = 2;
-
-    // Bus. Used for short- and long-distance bus routes.
-    BUS = 3;
-
-    // Ferry. Used for short- and long-distance boat service.
-    FERRY = 4;
-
-    // Cable car. Used for street-level cable cars where the cable runs beneath the car.
-    CABLECAR = 5;
-
-    // Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
-    GONDOLA = 6;
-
-    // Funicular. Any rail system designed for steep inclines.
-    FUNICULAR = 7;
-  }
-  optional RouteType route_type = 6;
-
-  // The route_url field contains the URL of a web page about that particular route.
-  optional string route_url = 7;
-
-  // In systems that have colors assigned to routes, the route_color field defines a color that corresponds to a route.
-  // The color must be provided as a six-character hexadecimal number, for example, 00FFFF.
-  optional string route_color = 8;
-
-  // The route_text_color field can be used to specify a legible color to use for text drawn against a background of route_color.
-  optional string route_text_color = 9;
-
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+enum ContinousPickupType {
+	// Continuous stopping pickup
+	CONTINOUS_PICKUP_TYPE_CONTINOUS = 0;
+	// No continuous stopping pickup.
+	CONTINOUS_PICKUP_TYPE_NON_CONTINOUS = 1;
+	// Must phone an agency to arrange continuous stopping pickup.
+	CONTINOUS_PICKUP_TYPE_MUST_PHONE = 2;
+	// Must coordinate with a driver to arrange continuous stopping pickup.
+	CONTINOUS_PICKUP_TYPE_MUST_COORDINATE = 3;
 }
 
-
-message Trips {
-  // The route_id field contains an ID that uniquely identifies a route.
-  required string route_id = 1;
-
-  // The service_id contains an ID that uniquely identifies a set of dates when service is available for one or more routes.
-  required string service_id = 2;
-
-  // The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
-  required string trip_id = 3;
-
-  // The trip_headsign field contains the text that appears on a sign that identifies the trip's destination to passengers.
-  optional string trip_headsign = 4;
-
-  // The trip_short_name field contains the text that appears in schedules and sign boards to identify the trip to passengers.
-  optional string trip_short_name = 5;
-
-  // The direction_id field contains a binary value that indicates the direction of travel for a trip.
-  enum Direction {
-    OUTBOUND = 0;
-
-    INBOUND = 1;
-  }
-  optional Direction direction_id = 6;
-
-  // The block_id field identifies the block to which the trip belongs.
-  // A block consists of two or more sequential trips made using the same vehicle,
-  // where a passenger can transfer from one trip to the next just by staying in the vehicle.
-  optional string block_id = 7;
-
-  // The shape_id field contains an ID that defines a shape for the trip.
-  optional string shape_id = 8;
-  
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+enum ContinousDropOffType {
+	// Continuous stopping drop-off.
+	CONTINOUS_DROP_OFF_TYPE_CONTINOUS = 0;
+	// No continuous stopping drop-off.
+	CONTINOUS_DROP_OFF_TYPE_NON_CONTINOUS = 1;
+	// Must phone an agency to arrange continuous stopping drop-off.
+	CONTINOUS_DROP_OFF_TYPE_MUST_PHONE = 2;
+	// Must coordinate with a driver to arrange continuous stopping drop-off.
+	CONTINOUS_DROP_OFF_TYPE_MUST_COORDINATE = 3;
 }
 
-message StopTimes {
-  // The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
-  required string trip_id = 1;
+message Route {
+  	// The route_id field contains an ID that uniquely identifies a route.
+  	// The route_id is dataset unique.
+	string route_id = 1;
+  	// The agency_id field defines an agency for the specified route. 
+	string agency_id = 2;
+  	// The route_short_name contains the short name of a route.
+	string route_short_name = 3;
+  	// The route_long_name contains the full name of a route.
+	string route_long_name = 4;
+  	// The route_desc field contains a description of a route. 
+	string route_desc = 5;
+	// The route_type field describes the type of transportation used on a route.
+	enum RouteType {
+		// Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
+		TRAM = 0;
+		// Subway, Metro. Any underground rail system within a metropolitan area.
+		SUBWAY = 1;
+		// Rail. Used for intercity or long-distance travel.
+		RAIL = 2;
+		// Bus. Used for short- and long-distance bus routes.
+		BUS = 3;
+		// Ferry. Used for short- and long-distance boat service.
+		FERRY = 4;
+		// Cable car. Used for street-level cable cars where the cable runs beneath the car.
+		CABLE_TRAM = 5;
+		// Aerial lift, suspended cable car (e.g., gondola lift, aerial tramway). Cable transport where cabins, cars, gondolas or open chairs are suspended by means of one or more cables.
+		AERIAL_LIFT = 6;
+		// Funicular. Any rail system designed for steep inclines.
+		FUNICULAR = 7;
+		// Electric buses that draw power from overhead wires using poles.
+		TROLLEYBUS = 8;
+		// Railway in which the track consists of a single rail or a beam.
+		MONORAIL = 9;
+	}
+	RouteType route_type = 6;
 
-  required string arrival_time = 2;
-  required string departure_time = 3;
-
-  // TODO: Brian why not make this:
-  // required int32 arrival_time_secs = 2;
-  // required int32 departure_time_secs = 3;
-
-  required string stop_id = 4;
-  required string stop_sequence = 5;
-  
-  optional string stop_headsign = 6;
-
-  enum AvailabilityType {
-    // Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
-    REGULAR = 0;
-
-    // Subway, Metro. Any underground rail system within a metropolitan area.
-    NOT_AVAILABLE = 1;
-
-    // Rail. Used for intercity or long-distance travel.
-    PHONE = 2;
-
-    // Bus. Used for short- and long-distance bus routes.
-    DRIVER = 3;
-  }
-  optional AvailabilityType pickup_type = 7 [default = REGULAR];
-  
-  optional AvailabilityType drop_off_type = 8 [default = REGULAR];
-  
-  optional float shape_dist_traveled = 9;
-
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+  	// The route_url field contains the URL of a web page about that particular route.
+	string route_url = 7;
+  	// In systems that have colors assigned to routes, the route_color field defines a color that corresponds to a route.
+  	// The color must be provided as a six-character hexadecimal number, for example, 00FFFF.
+	string route_color = 8;
+  	// The route_text_color field can be used to specify a legible color to use for text drawn against a background of route_color.
+	string route_text_color = 9;
+	// Orders the routes in a way which is ideal for presentation to customers. Routes with smaller route_sort_order values should be displayed first.
+	uint32 route_sort_order = 10;
+	// Indicates whether a rider can board the transit vehicle anywhere along the vehicle’s travel path. The path is described by shapes.txt on every trip of the route.
+	ContinousPickupType continous_pickup = 11;
+	// Indicates whether a rider can alight from the transit vehicle at any point along the vehicle’s travel path. The path is described by shapes.txt on every trip of the route. 
+	ContinousDropOffType continuous_drop_off = 12;
 }
 
-message Calendar {
-  // The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
-  required string service_id = 1;
+message Trip {
+	// The route_id field contains an ID that uniquely identifies a route.
+	string route_id = 1;
+	// The service_id contains an ID that uniquely identifies a set of dates when service is available for one or more routes.
+	string service_id = 2;
+	// The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
+	string trip_id = 3;
+	// The trip_headsign field contains the text that appears on a sign that identifies the trip's destination to passengers.
+	string trip_headsign = 4;
+	// The trip_short_name field contains the text that appears in schedules and sign boards to identify the trip to passengers.
+	string trip_short_name = 5;
+	// The direction_id field contains a binary value that indicates the direction of travel for a trip.
+	enum Direction {
+		UNKNOWN = 0;
+		// Travel in the opposite direction (e.g. inbound travel).
+		INBOUND = 1;
+		// Travel in one direction (e.g. outbound travel).
+		OUTBOUND = 2;
+		
+	}
+	// Indicates the direction of travel for a trip. This field is not used in routing; it provides a way to separate trips by direction when publishing time tables. 
+	Direction direction_id = 6;
+	// The block_id field identifies the block to which the trip belongs.
+	// A block consists of two or more sequential trips made using the same vehicle,
+	// where a passenger can transfer from one trip to the next just by staying in the vehicle.
+	string block_id = 7;
+	// The shape_id field contains an ID that defines a shape for the trip.
+	string shape_id = 8;
 
-  required bool monday = 2;
-  required bool tuesday = 3;
-  required bool wednesday = 4;
-  required bool thursday = 5;
-  required bool friday = 6;
-  required bool saturday = 7;
-  required bool sunday = 8;
+	enum WheelchairAccessible {
+		// No accessibility information for the trip.
+		WHEELCHAIR_ACCESSIBLE_NO_INFORMATION = 0;
+		// Vehicle being used on this particular trip can accommodate at least one rider in a wheelchair.
+		WHEELCHAIR_ACCESSIBLE_ATLEAST_ONE_WHEELCHAIR = 1;
+		// No riders in wheelchairs can be accommodated on this trip.
+		WHEELCHAIR_ACCESSIBLE_NO_WHEELCHAIR = 2;
 
-  required string start_date = 9;
-  required string end_date = 10;
+	}
+	// Indicates wheelchair accessibility.
+	WheelchairAccessible wheelchair_accessible = 9;
 
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+	enum BikesAllowed {
+		// No bike information for the trip.
+		BIKES_ALLOWED_NO_INFORMATION = 0;
+		// Vehicle being used on this particular trip can accommodate at least one bicycle.
+		BIKES_ALLOWED_ATLEAST_ONE_BICYCLE = 1;
+		// No riders in wheelchairs can be accommodated on this trip.
+		BIKES_ALLOWED_NO_BICYCLE = 2;
+	}
+	// Indicates whether bikes are allowed.
+	BikesAllowed bikes_allowed = 10;
+
+
 }
 
-message CalendarDates {
-  // The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
-  required string service_id = 1;
+message StopTime {
+	// Identifies a trip.
+	string trip_id = 1;
+	// Arrival time at a specific stop for a specific trip on a route. If there are not separate times for arrival and departure at a stop, enter the same value for arrival_time and departure_time. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins.
+	string arrival_time = 2;
+	// Departure time from a specific stop for a specific trip on a route. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. If there are not separate times for arrival and departure at a stop, enter the same value for arrival_time and departure_time. See the arrival_time description for more details about using timepoints correctly. 
+	string departure_time = 3;
+	// Identifies the serviced stop. All stops serviced during a trip must have a record in stop_times.txt. Referenced locations must be stops, not stations or station entrances. A stop may be serviced multiple times in the same trip, and multiple trips and routes may service the same stop.
+	string stop_id = 4;
+	// Order of stops for a particular trip. The values must increase along the trip but do not need to be consecutive.
+	uint32 stop_sequence = 5;
+	// Text that appears on signage identifying the trip's destination to riders. This field overrides the default trips.trip_headsign when the headsign changes between stops. If the headsign is displayed for an entire trip, use trips.trip_headsign instead. 
+	string stop_headsign = 6;
 
-  required string date = 2;
-  
-  enum ExceptionType {
-    ADDED = 1;
-    REMOVED = 2;
-  }
-  required ExceptionType exception_type = 3;
+	enum PickupType {
+		// Regularly scheduled pickup. 
+		PICKUP_TYPE_REGULAR = 0;
+		// No pickup available.
+		PICKUP_TYPE_NOT_AVAILABLE = 1;
+		// Must phone agency to arrange pickup.
+		PICKUP_TYPE_PHONE_AGENCY = 2;
+		// Must coordinate with driver to arrange pickup.
+		PICKUP_TYPE_DRIVER_W_DRIVER = 3;
+	}
+	// Indicates pickup method. 
+	PickupType pickup_type = 7;
 
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+	enum DropOffType {
+		// Regularly scheduled drop off. 
+		DROP_OFF_TYPE_REGULAR = 0;
+
+		// No drop off available.
+		DROP_OFF_TYPE_NOT_AVAILABLE = 1;
+
+		// Must phone agency to arrange drop off.
+		DROP_OFF_TYPE_PHONE_AGENCY = 2;
+
+		// Must coordinate with driver to arrange drop off.
+		DROP_OFF_TYPE_DRIVER_W_DRIVER = 3;
+	}
+	// Indicates drop off method.
+	DropOffType drop_off_type = 8;
+
+	// Indicates whether a rider can board the transit vehicle at any point along the vehicle’s travel path. The path is described by shapes.txt, from this stop_time to the next stop_time in the trip’s stop_sequence. 
+	ContinousPickupType continuous_pickup = 9;
+	// Indicates whether a rider can alight from the transit vehicle at any point along the vehicle’s travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip’s stop_sequence.
+	ContinousDropOffType continuous_drop_off = 10;
+	// Actual distance traveled along the associated shape, from the first stop to the stop specified in this record. This field specifies how much of the shape to draw between any two stops during a trip. Must be in the same units used in shapes.txt. Values used for shape_dist_traveled must increase along with stop_sequence; they cannot be used to show reverse travel along a route.
+	float shape_dist_traveled = 11;
+
+	enum Timepoint {
+		TIMEPOINT_APPROX = 0;
+		TIMEPOINT_EXACT = 1;
+	}
+	// Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. This field allows a GTFS producer to provide interpolated stop-times, while indicating that the times are approximate.
+	Timepoint timepoint = 12;
 }
 
-message FareAttributes {
-  required string fare_id = 1;
-  required float price = 2;
-  required string currency_type = 3;
-  
-  enum PaymentMethod {
-    ONBOARD = 1;
-    PREBOARDING = 2;
-  }
-  required PaymentMethod payment_method = 4;
-  
-  enum Transfers {
-    NO = 0;
-    ONCE = 1;
-    TWICE = 2;
-    UNLIMITED = 3;
-  }
-  required Transfers transfers = 5;
+message CalendarEntry {
+	// The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
+	string service_id = 1;
 
-  optional int32 transfer_duration = 6;
-  
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+	bool monday = 2;
+	bool tuesday = 3;
+	bool wednesday = 4;
+	bool thursday = 5;
+	bool friday = 6;
+	bool saturday = 7;
+	bool sunday = 8;
+	// Start service day for the service interval.
+	string start_date = 9;
+	// End service day for the service interval. This service day is included in the interval.
+	string end_date = 10;
 }
 
-message FareRules {
-  required string fare_id = 1;
-  optional string route_id = 2;
-  optional string origin_id = 3;
-  optional string destination_id = 4;
-  optional string contains_id = 5;
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+message CalendarDateEntry {
+	// The trip_id field contains an ID that identifies a trip. The trip_id is dataset unique.
+	string service_id = 1;
+	// Date when service exception occurs.
+	string date = 2;
+	
+	enum ExceptionType {
+		// This value is not known.
+		EXCEPTION_TYPE_UNKNOWN = 0;
+		// Service has been added for the specified date.
+		EXCEPTION_TYPE_ADDED = 1;
+		// Service has been removed for the specified date.
+		EXCEPTION_TYPE_REMOVED = 2;
+	}
+	// Indicates whether service is available on the date specified in the date field. 
+	ExceptionType exception_type = 3;
 }
 
-message Shapes {
-  required string shape_id = 1;
-  optional float shape_pt_lat = 2;
-  optional float shape_pt_lon = 3;
-  optional int32 shape_pt_sequence = 4;
-  optional float shape_dist_traveled = 5;
-  
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+message FareAttribute {
+	// Identifies a fare class.
+	string fare_id = 1;
+	// Fare price, in the unit specified by currency_type.
+	float price = 2;
+	// Currency used to pay the fare.
+	string currency_type = 3;
+	
+	enum PaymentMethod {
+		// Fare is paid on board.
+		PAYMENT_METHOD_ONBOARD = 0;
+		// Fare must be paid before boarding.
+		PAYMENT_METHOD_PREBOARDING = 1;
+	}
+	// Indicates when the fare must be paid.
+	PaymentMethod payment_method = 4;
+	
+	enum TransferType {
+		// No transfers permitted on this fare.
+		TRANSFER_TYPE_NO = 0;
+		// Riders may transfer once.
+		TRANSFER_TYPE_ONCE = 1;
+		// Riders may transfer twice.
+		TRANSFER_TYPE_TWICE = 2;
+		// Unlimited transfers are permitted.
+		TRANSFER_TYPE_UNLIMITED = 3;
+	}
+	// Indicates the number of transfers permitted on this fare. The fact that this field can be left empty is an exception to the requirement that a Required field must not be empty. 
+	TransferType transfers = 5;
+	// Identifies the relevant agency for a fare. This field is required for datasets with multiple agencies defined in agency.txt, otherwise it is optional.
+	string agency_id = 6;
+	// Length of time in seconds before a transfer expires. When transfers=0 this field can be used to indicate how long a ticket is valid for or it can can be left empty.
+	int32 transfer_duration = 7;
 }
 
-message Frequencies {
-  required string trip_id = 1;
-  required string start_time = 2;
-  required string end_time = 3;
-  required int32 headway_secs = 4;
-  enum ScheduleType {
-    NOT_EXACTLY = 0;
-    EXACTLY = 1;
-  }
-  optional ScheduleType exact_times = 5 [default = NOT_EXACTLY];
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+message FareRule {
+	// Identifies a fare class.
+	string fare_id = 1;
+	// Identifies a route associated with the fare class. If several routes with the same fare attributes exist, create a record in fare_rules.txt for each route.
+	string route_id = 2;
+	// Identifies an origin zone. If a fare class has multiple origin zones, create a record in fare_rules.txt for each origin_id.
+	string origin_id = 3;
+	// Identifies a destination zone. If a fare class has multiple destination zones, create a record in fare_rules.txt for each destination_id.
+	string destination_id = 4;
+	// Identifies the zones that a rider will enter while using a given fare class. Used in some systems to calculate correct fare class.
+	string contains_id = 5;
 }
 
-message Transfers {
-  required string from_stop_id = 1;
-  required string to_stop_id = 2;
-  enum TransferType {
-    RECOMMENDED = 0;
-    TIMED = 1;
-    MINIMUM = 2;
-    NOT_POSSIBLE = 3;
-  }
-  required TransferType transfer_type = 3;
-  
-  optional int32 min_transfer_time = 4;
+message Shape {
+	// Identifies a shape.
+	string shape_id = 1;
+	// Latitude of a shape point. Each record in shapes.txt represents a shape point used to define the shape.
+	float shape_pt_lat = 2;
+	// Longitude of a shape point.
+	float shape_pt_lon = 3;
+	// Sequence in which the shape points connect to form the shape. Values must increase along the trip but do not need to be consecutive.
+	uint32 shape_pt_sequence = 4;
+	// Actual distance traveled along the shape from the first shape point to the point specified in this record. Used by trip planners to show the correct portion of the shape on a map. Values must increase along with shape_pt_sequence; they cannot be used to show reverse travel along a route. Distance units must be consistent with those used in stop_times.txt.
+	float shape_dist_traveled = 5;
+}
 
-  // The extensions namespace allows 3rd-party developers to extend the
-  // GTFS specification in order to add and evaluate new features and
-  // modifications to the spec.
-  extensions 1000 to 1999;
+message FrequencyEntry {
+	// Identifies a trip to which the specified headway of service applies.
+	string trip_id = 1;
+	// Time at which the first vehicle departs from the first stop of the trip with the specified headway.
+	string start_time = 2;
+	// Time at which service changes to a different headway (or ceases) at the first stop in the trip.
+	string end_time = 3;
+	// Time, in seconds, between departures from the same stop (headway) for the trip, during the time interval specified by start_time and end_time. Multiple headways for the same trip are allowed, but may not overlap. New headways may start at the exact time the previous headway ends.
+	uint32 headway_secs = 4;
+	
+	enum ScheduleType {
+		// Frequency-based trips.
+		NOT_EXACTLY = 0;
+		// Schedule-based trips with the exact same headway throughout the day. In this case the end_time value must be greater than the last desired trip start_time but less than the last desired trip start_time + headway_secs.
+		EXACTLY = 1;
+	}
+	// Indicates the type of service for a trip. See the file description for more information.
+	ScheduleType exact_times = 5;
+}
+
+message Transfer {
+	// Identifies a stop or station where a connection between routes begins. If this field refers to a station, the transfer rule applies to all its child stops.
+	string from_stop_id = 1;
+	// Identifies a stop or station where a connection between routes ends. If this field refers to a station, the transfer rule applies to all child stops.
+	string to_stop_id = 2;
+	enum TransferType {
+		// Recommended transfer point between routes.
+		TRANSFER_TYPE_RECOMMENDED = 0;
+		// Timed transfer point between two routes. The departing vehicle is expected to wait for the arriving one and leave sufficient time for a rider to transfer between routes.
+		TRANSFER_TYPE_TIMED = 1;
+		// Transfer requires a minimum amount of time between arrival and departure to ensure a connection. The time required to transfer is specified by min_transfer_time.
+		TRANSFER_TYPE_MINIMUM = 2;
+		// Transfers are not possible between routes at the location.
+		TRANSFER_TYPE_NOT_POSSIBLE = 3;
+	}
+	// Indicates the type of connection for the specified (from_stop_id, to_stop_id) pair.
+	TransferType transfer_type = 3;
+	
+	// Amount of time, in seconds, that must be available to permit a transfer between routes at the specified stops. The min_transfer_time should be sufficient to permit a typical rider to move between the two stops, including buffer time to allow for schedule variance on each route.
+	uint32 min_transfer_time = 4;
+}
+
+message Pathway {
+	// The pathway_id field contains an ID that uniquely identifies the pathway. The pathway_id is used by systems as an internal identifier of this record (e.g., primary key in database), and therefore the pathway_id must be dataset unique. 
+	// Different pathways can go from the same from_stop_id to the same to_stop_id. For example, this happens when two escalators are side by side in opposite direction, or when a stair is nearby and elevator and both go from the same place to the same place.
+	string pathway_id = 1;
+	// Location at which the pathway begins. It contains a stop_id that identifies a platform, entrance/exit, generic node or boarding area from the stops.txt file.
+	string from_stop_id = 2;
+	// Location at which the pathway ends. It contains a stop_id that identifies a platform, entrance/exit, generic node or boarding area from the stops.txt file.
+	string to_stop_id = 3;
+
+	enum PathwayModeType {
+		PATHWAY_MODE_UNKNOWN = 0;
+		// walkway
+		PATHWAY_MODE_WALKWAY = 1;
+		// stairs
+		PATHWAY_MODE_STAIRS = 2;
+		// moving sidewalk/travelator 
+		PATHWAY_MODE_MOVING_SIDEWALK = 3;
+		// escalator
+		PATHWAY_MODE_ESCALATOR = 4;
+		// elevator
+		PATHWAY_MODE_ELEVATOR = 5;
+		// (or payment gate): A pathway that crosses into an area of the station where a proof of payment is required (usually via a physical payment gate).
+		PATHWAY_MODE_FARE_GATE = 6;
+		// Indicates a pathway exiting an area where proof-of-payment is required into an area where proof-of-payment is no longer required.
+		PATHWAY_MODE_EXIT_GATE = 7;
+	}
+	// Type of pathway between the specified (from_stop_id, to_stop_id) pair.
+	PathwayModeType pathway_mode = 4;
+	// Indicates in which direction the pathway can be used:
+	// 0: Unidirectional pathway, it can only be used from from_stop_id to to_stop_id.
+	// 1: Bidirectional pathway, it can be used in the two directions.
+	bool is_bidirectional = 5;
+	// Horizontal length in meters of the pathway from the origin location (defined in from_stop_id) to the destination location (defined in to_stop_id).
+	float length = 6;
+	// Average time in seconds needed to walk through the pathway from the origin location (defined in from_stop_id) to the destination location (defined in to_stop_id).
+	uint32 traversal_time = 7;
+	// Number of stairs of the pathway.
+	uint32 stair_count = 8;
+	// Maximum slope ratio of the pathway
+	// 0: no slope.
+	// A float: slope ratio of the pathway, positive for upwards, negative for downwards.
+	float max_slope = 9;
+	// Minimum width of the pathway in meters.
+	float min_width = 10;
+	// String of text from physical signage visible to transit riders. The string can be used to provide text directions to users, such as 'follow signs to '. The language text should appear in this field exactly how it is printed on the signs - it should not be translated.
+	string signposted_as = 11;
+	// Same than the signposted_as field, but when the pathways is used backward, i.e. from the to_stop_id to the from_stop_id.
+	string reversed_signposted_as = 12;
+}
+
+message Level {
+	// Id of the level that can be referenced from stops.txt.
+	string level_id = 1;
+	// Numeric index of the level that indicates relative position of this level in relation to other levels (levels with higher indices are assumed to be located above levels with lower indices).
+	float level_index = 2;
+	// Optional name of the level (that matches level lettering/numbering used inside the building or the station). Is useful for elevator routing (e.g. “take the elevator to level “Mezzanine” or “Platforms” or “-1”).
+	string level_name = 3;
+}
+
+message FeedInfoEntry {
+	// Full name of the organization that publishes the dataset. This might be the same as one of the agency.agency_name values.
+	string feed_publisher_name = 1;
+	// URL of the dataset publishing organization's website. This may be the same as one of the agency.agency_url values.
+	string feed_publisher_url = 2;
+	// Default language for the text in this dataset. This setting helps GTFS consumers choose capitalization rules and other language-specific settings for the dataset.
+	string feed_lang = 3;
+	// Defines the language used when the data consumer doesn’t know the language of the rider. It's often defined as en, English.
+	string default_lang = 4;
+	// The dataset provides complete and reliable schedule information for service in the period from the beginning of the feed_start_date day to the end of the feed_end_date day. Both days can be left empty if unavailable. The feed_end_date date must not precede the feed_start_date date if both are given. Dataset providers are encouraged to give schedule data outside this period to advise of likely future service, but dataset consumers should treat it mindful of its non-authoritative status. If feed_start_date or feed_end_date extend beyond the active calendar dates defined in calendar.txt and calendar_dates.txt, the dataset is making an explicit assertion that there is no service for dates within the feed_start_date to feed_end_date range but not included in the active calendar dates.
+	string feed_start_date = 5;
+	// Refer to the feed_start_date row in this table.
+	string feed_end_date = 6;
+	// String that indicates the current version of their GTFS dataset. GTFS-consuming applications can display this value to help dataset publishers determine whether the latest dataset has been incorporated.
+	string feed_version = 7;
+	// Email address for communication regarding the GTFS dataset and data publishing practices. feed_contact_email is a technical contact for GTFS-consuming applications. Provide customer service contact information through agency.txt.
+	string feed_contact_email = 8;
+	// URL for contact information, a web-form, support desk, or other tools for communication regarding the GTFS dataset and data publishing practices. feed_contact_url is a technical contact for GTFS-consuming applications. Provide customer service contact information through agency.txt.
+	string feed_contact_url = 9;
+}
+
+message Translation {
+	enum TableName {
+		AGENCY = 0;
+		STOPS = 1;
+		ROUTES = 2;
+		TRIPS = 3;
+		STOP_TIMES = 4;
+		FEED_INFO = 5;
+		PATHWAYS = 6;
+		LEVELS = 7;
+		ATTRIBUTIONS = 8;
+	}
+	// Defines the dataset table that contains the field to be translated.
+	TableName table_name = 1;
+	// Provides the name of the field to be translated. Fields with the type "Text" can be translated, while fields with the types "URL," "Email," and "Phone number" can be included here to provide those resources in the correct language.
+	string field_name = 2;
+	// Provides the language of translation.
+	string language = 3;
+	// Provides the translated value for the specified field_name.
+	string translation = 4;
+	// Defines the record that corresponds to the field to be translated. The value in record_id needs to be a main ID from a dataset table,
+	string record_id = 5;
+	// Helps to translate the record that contains the field when the table referenced in record_id doesn’t have a unique ID. The value in record_sub_id is the secondary ID of a dataset table
+	string record_sub_id = 6;
+	// Instead of using record_id and record_sub_id to define which record needs to be translated, field_value can be used to define the value for translation. When used, the translation is applied when the field identified by table_name and field_name contains the exact same value defined in field_value.
+	string field_value = 7;
+}
+
+message Attribution {
+	// Identifies an attribution for the dataset, or a subset of it. This field is useful for translations.
+	string attribution_id = 1;
+	// The agency to which the attribution applies. If one agency_id, route_id, or trip_id attribution is defined, the other fields must be empty. If none are specified, the attribution applies to the whole dataset.
+	string agency_id = 2;
+	// This field functions in the same way as agency_id, except the attribution applies to a route. Multiple attributions can apply to the same route.
+	string route_id = 3;
+	// This field functions in the same way as agency_id, except the attribution applies to a trip. Multiple attributions can apply to the same trip.
+	string trip_id = 4;
+	// The name of the organization that the dataset is attributed to.
+	string organization_name = 5;
+	// The role of the organization is producer. Allowed values include the following:
+	// 0 or empty: Organization doesn’t have this role.
+	// 1: Organization does have this role.
+	// At least one of the fields, either is_producer, is_operator, or is_authority, must be set at 1.
+	bool is_producer = 6;
+	// Functions in the same way as is_producer, except the role of the organization is operator.
+	bool is_operator = 7;
+	// Functions in the same way as is_producer, except the role of the organization is authority.
+	bool is_authority = 8;
+	// The URL of the organization.
+	string attribution_url = 9;
+	// The email of the organization.
+	string attribution_email = 10;
+	// The phone number of the organization.
+	string attribution_phone = 11;
 }
