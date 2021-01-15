@@ -1,0 +1,64 @@
+// MIT License
+
+// Copyright (c) 2020 The Ministry of Housing and Urban Affairs
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+enum VehicleType {
+    // Vehicle type is not known or not specified.
+    VEHICLE_TYPE_UNKNOWN = 0;
+    // Vehicle is used for agricultural purposes.
+    VEHICLE_TYPE_AGRICULTURAL_VEHICLE = 1;
+    // Vehicle type is a bicycle.
+    VEHICLE_TYPE_BICYCLE = 2;
+    // Vehicle type is a bus.
+    VEHICLE_TYPE_BUS = 3;
+    // Vehicle type is car.
+    VEHICLE_TYPE_CAR = 4;
+    // Vehicle type is a caravan.
+    VEHICLE_TYPE_CARAVAN = 5;
+    // Vehicle type is a car with an attached caravan.
+    VEHICLE_TYPE_CAR_WITH_CARAVAN = 6;
+    // Vehicle type is a car with an attached trailer.
+    VEHICLE_TYPE_CAR_WITH_TRAILER = 7;
+    // Vehicle is used for construction and maintainance purposes.
+    VEHICLE_TYPE_CONSTRUCTION_OR_MAINTENANCE_VEHICLE = 8;
+    // Vehicle type is a lorry.
+    VEHICLE_TYPE_LORRY = 9;
+    // Vehicle type is a moped.
+    VEHICLE_TYPE_MOPED = 10;
+    // Vehicle type is a motorcycle.
+    VEHICLE_TYPE_MOTORCYCLE = 11;
+    // Vehicle type is a motorcycle with an attached sidecar.
+    VEHICLE_TYPE_MOTORCYCLE_WITH_SIDECAR = 12;
+    // Vehicle type is a motor scooter.
+    VEHICLE_TYPE_MOTOR_SCOOTER = 13;
+    // Vehicle type is a tanker.
+    VEHICLE_TYPE_TANKER = 14;
+    // Vehicle type is a trailer.
+    VEHICLE_TYPE_TRAILER = 15;
+    // Vehicle type is a van.
+    VEHICLE_TYPE_VAN = 16;
+    // Vehicle type could be anything.
+    VEHICLE_TYPE_ANY_VEHICLE = 17;
+    // Vehicle type is an autorickshaw.
+    VEHICLE_TYPE_AUTORICKSHAW = 18;
+}

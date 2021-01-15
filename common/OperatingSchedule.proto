@@ -22,30 +22,22 @@
 
 syntax = "proto3";
 
-message Header {
-    // Version of the dataset.
-    string version = 1;
-  
-    // Determines whether the current fetch is incremental.
-    enum Incrementality {
-        UNKNOWN = 0;
-        FULL_DATASET = 1;
-        DIFFERENTIAL = 2;
+message OperatingSchedule {
+    enum DaysOfWeek {
+        DAY_UNKNOWN = 0;
+        DAY_SUNDAY = 1;
+        DAY_MONDAY = 2;
+        DAY_TUESDAY = 3;
+        DAY_WEDNESDAY = 4;
+        DAY_THURSDAY = 5;
+        DAY_FRIDAY = 6;
+        DAY_SATURDAY = 7;
     }
-    Incrementality incrementality = 2;
-  
-    // This timestamp identifies the moment when the content of this feed has been
-    // created (time at the server). In POSIX time (i.e., number of seconds since
-    // January 1st 1970 00:00:00 UTC).
-    uint64 timestamp = 3;
 
-    // Publisher/Provider of the dataset.
-    Provider provider = 4;
-}
-
-message Provider {
-    // Unique identifier of the provider.
-    string id = 1;
-    // Name of the provider.
-    string name = 2;
+    // Opening time
+    string opening = 1;
+    // CLosing time.
+    string closing = 2;
+    // Open day of the week.
+    repeated DaysOfWeek dayOfWeek = 3;
 }

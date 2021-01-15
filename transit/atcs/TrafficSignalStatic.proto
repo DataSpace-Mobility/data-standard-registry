@@ -1,0 +1,141 @@
+// MIT License
+
+// Copyright (c) 2020-2021 The Ministry of Housing and Urban Affairs, GoI
+// Copyright (c) 2020-2021 National Institute of Urban Affairs
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// v0.0.1
+
+syntax = "proto3";
+package atcs_traffic_signal_static;
+option java_package = "in.gov.mohua.ds.transit";
+
+import "Header.proto";
+import "Location.proto";
+
+message FeedMessage {
+    // Metadata
+    Header header = 1;
+
+    // Information about all the junctions in the system.
+    repeated Junction junction = 2;
+
+    // Information on all the corridors.
+    repeated Corridor corridor = 3;
+}
+
+// A Junction is a physical  point where at least two roads meet, hence traffic can change between different routes and/or directions at it.
+message Junction {
+    // Unique ID of the junction.
+    string id = 1;
+    // Aggregated time in seconds for green signal across all ways in that junction. 
+    uint32 maxCycleTimeSeconds = 2;
+
+    enum OperationMode {
+        // Junction operation mode is not known.
+        OPERATION_MODE_UNKNOWN = 0;
+        // Junction changes the signal bases on fixed time for red and green light.
+        OPERATION_MODE_TIMER_FIXED = 1;
+        OPERATION_MODE_FULL_VA_SPLIT = 2;
+    }
+    OperationMode operationMode = 3;
+
+    // Location of the controller installed at the junction.
+    Location location = 4;
+
+    message CorridorRelationship {
+        // ID of the corridor this junction is related to.
+        string corridorId = 1;
+        // Distance in Km from the first junction in the corridor
+        float distanceFromOriginJunction = 2;
+        // Position of the junction within the corridor.
+        uint32 sequenceNo = 3;
+    }
+    repeated CorridorRelationship corridorRelationship = 5;
+    
+    // Information on each carriageway inbound and outbound from the junction.
+    repeated Carriageway carriageway = 6;
+}
+
+// Information about the Carriageway. A Carriageway is a set of TrafficLanes which follow a common direction in the beginning and then splits.
+message Carriageway {
+    // Unique ID for the way.
+    string id = 1;
+    // Position (ordered) of the way in the junction. Traffic signal change will follow this order.
+    uint32 sequenceNo = 2;
+    // Location on the carriageway where traffic halts. Given by the latitude and longitude in deegres utilising the WGS-84 coordinate system.
+    Location location  = 3;
+    // Lane level information for the way.
+    repeated TrafficLane trafficLane = 4;
+}
+
+// A TrafficLane is a section of a carriageway that is designated (usually by lines of other physical barriers as bollards) to be used by a single line of vehicles to organise traffic and guide drivers
+// Describes a direction of travel. Although a way can have multiple traffic lanes in each direction, this structure groups them and represents all traffic in one direction per TrafficLane.
+message TrafficLane {
+    // Unique ID of the lane.
+    string id = 1;
+    // Position (ordered) of the way in the junction. Traffic signal change will follow this order.
+    uint32 sequenceNo = 2;
+
+    // Direction or change of direction permited for the vehicles at the TrafficLane.
+    message Direction {
+        // Name of a significant place from which the way is leading from.
+        string to = 1;
+        // Name of a significant place to which the way is leading to.
+        string from = 2;
+
+        enum Turn {
+            // Turn direction is unknown.
+            TURN_DIRECTION_UNKNOWN = 0;
+            // This lane turns to the left.
+            TURN_DIRECTION_LEFT = 1;
+            // This lane goes straight.
+            TURN_DIRECTION_STRAIGHT = 2;
+            // This lane turns to the right.
+            TURN_DIRECTION_RIGHT = 3;
+            // This lane takes a u-turn.
+            TURN_DIRECTION_U_TURN = 4;
+        }
+        Turn turn = 3;
+    }
+    Direction Direction = 3;
+
+    // Type of modes that are allowed through a lane.
+    enum ModeOfTransportAllowed {
+        // Motorised vehicles are allowed on this lane.
+        MOTORISED = 0;
+        // Bicycles are allowed on this lane.
+        BICYCLE = 1;
+        // Pedestrians are allowed on this lane.
+        PEDESTRIAN = 2;
+    }
+    // Typology of vehicles allowed to circulate at the TrafficLane.
+    ModeOfTransportAllowed modeOfTransportAllowed = 4;
+}
+
+// Corridor is a set of junctions. One junction can be part of multiple corridors.
+message Corridor {
+    // Unique ID allocated to the corridor.
+    string corridorId = 1;
+    // Name of the corridor.
+    string corridorName = 2;
+    // List of all junction IDs in the corridor.
+    repeated string junctionId = 3;
+}

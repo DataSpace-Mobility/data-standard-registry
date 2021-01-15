@@ -1,0 +1,195 @@
+// MIT License
+
+// Copyright (c) 2020 The Ministry of Housing and Urban Affairs
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// v0.0.3
+
+syntax = "proto3";
+package ev_charging_static;
+option java_package = "in.gov.mohua.ds.transit";
+
+import "Header.proto";
+import "OperatingSchedule.proto";
+import "ModeOfPayment.proto";
+import "Location.proto";
+import "VehicleType.proto";
+import "BatteryType.proto";
+
+message FeedMessage {
+    // Metadata
+    Header header = 1;
+
+    // Information about the specific EV charging station. 
+    repeated Station stations = 2;
+}
+
+message Station {
+    message Info {
+        // Name of the specific EV charging station.
+        string name = 1;
+        // Address of the specific EV charging station.
+        string address = 2;
+        // Image of the specific EV charging station (if any).
+        string image = 3;
+        // Name of the operator of the specific EV charging station.
+        string operator = 4;
+        // Name of the owner of the specific EV charging station.
+        string owner = 5;
+        // Mode(s) of payment accepted at the specific EV charging station.
+        repeated ModeOfPayment acceptedModeOfPayment = 6;
+    }
+
+    message VehicleCapacity {
+        // Type of the vehicle.
+        VehicleType vehicleType = 1;
+        // Vehicle capacity count.
+        uint32 count = 2;
+    }
+
+    message Tariff {
+        float baseUnitPrice = 1;
+        float surcharge = 2;
+        float subsidy = 3;
+        float unitPrice = 4;
+    }
+
+    // Uniique identifier for a charging station.
+    string id  = 1;
+    // General information about the specific EV charging station. 
+    Info info = 2;
+    // Information about the total vehicle capacity by type supported at the 
+    // specific EV charging station.
+    repeated VehicleCapacity vehicleCapacity = 3;
+    // Location of the specific EV charging station.
+    Location location = 4;
+    // Operating schedule of the specific EV charging station.
+    OperatingSchedule operatingSchedule = 5;
+    // Status of operation of the specific EV charging station.
+    Status status = 6;
+    // Typology of vehicles allowed at the specific EV charging station.
+    repeated VehicleType allowedVehicleType = 7;
+    // Information about the specific charging unit. 
+    repeated ChargingUnit chargingUnits = 8;
+    // Information about the specific battery swapping unit. 
+    repeated SwappingUnit swappingUnits = 9;
+}
+
+enum Status {
+    // The status of operation for the specific EV charging station is unknown.
+    STATUS_UNKNOWN = 0;
+    // The specific EV charging station is operating. 
+    STATUS_IN_OPERATION = 1;
+    // The specific EV charging station is not operating thus out of service.
+    STATUS_OUT_OF_SERVICE = 2;
+}
+
+message ChargingUnit {
+    enum ChargingUnitType {
+        // The typology of the specific charging unit is not known / specified. 
+        CHARGING_UNIT_TYPE_UNKNOWN = 0;
+        // The specific charging unit charges the EVs via a wire. 
+        CHARGING_UNIT_TYPE_WIRED = 1;
+        // The specific charging unit charges the EVs without the need of a wire.
+        CHARGING_UNIT_TYPE_WIRELESS = 2;
+        // // The specific charging unit charges the EVs both with wires and wireless.
+        CHARGING_UNIT_TYPE_WIRED_WIRELESS = 3;
+    }
+
+    message Socket {
+        enum SocketType {
+            // The specific socket is not known / specified. 
+            CHARGING_UNIT_SOCKET_TYPE_UNKNOWN = 0;
+
+            CHARGING_UNIT_SOCKET_TYPE_BEVC_AC001 = 1;
+
+            CHARGING_UNIT_SOCKET_TYPE_BEVC_DC001 = 2;
+            // The specific socket is TYPE2.
+            CHARGING_UNIT_SOCKET_TYPE_TYPE2 = 3;
+            CHARGING_UNIT_SOCKET_TYPE_TYPE3 = 4;
+            CHARGING_UNIT_SOCKET_TYPE_CHADEMO = 5;
+            CHARGING_UNIT_SOCKET_TYPE_CCS_SAE = 6;
+            CHARGING_UNIT_SOCKET_TYPE_CCS1 = 7;
+            CHARGING_UNIT_SOCKET_TYPE_CCS2 = 8;
+            CHARGING_UNIT_SOCKET_TYPE_TESLA = 9;
+            CHARGING_UNIT_SOCKET_TYPE_J_1772 = 10;
+            CHARGING_UNIT_SOCKET_TYPE_WALL_EURO = 11;
+            CHARGING_UNIT_SOCKET_TYPE_CARAVAN_MAINS_SOCKET = 12;
+            CHARGING_UNIT_SOCKET_TYPE_DUAL_J_1772 = 13;
+            CHARGING_UNIT_SOCKET_TYPE_DUAL_CHADEMO = 14;
+            CHARGING_UNIT_SOCKET_TYPE_MENNEKES = 15;
+            CHARGING_UNIT_SOCKET_TYPE_DUAL_MENNEKES = 16;
+            CHARGING_UNIT_SOCKET_TYPE_GB_T = 17;
+            CHARGING_UNIT_SOCKET_TYPE_OTHER = 18;
+        }
+
+        // Unique identifier of charging socket or gun.
+        string id = 1;
+        // Typology of the specific socket. 
+        SocketType type = 2;
+    }
+
+    message WirelessPod {
+        enum WirelessPodType {
+            // The specific wireless pod is a Capacitive Wireless Charging System (CWCS).
+            WIRELESS_POD_TYPE_CWCS = 0;
+            // The specific wireless pod is a Permanent Magnetic Gear Wireless Charging System (PMWC).
+            WIRELESS_POD_TYPE_PMWC = 1;
+            // The specific wireless pod is a Inductive Wireless Charging System (IWC).
+            WIRELESS_POD_TYPE_IWC = 2;
+            // The specific wireless pod is a Resonant Inductive Wireless Charging System (RIWC)
+            WIRELESS_POD_TYPE_RIWC = 3;
+        }
+
+        // Unique identification number assigned to each wireless pod. 
+        string id = 1;
+        // Area (in sq m) assigned to each wireless pod. 
+        float area = 2;
+        // Typology of the specific wireless pod. 
+        WirelessPodType type = 3;
+    }
+
+    // Unique identification number assigned to each charging unit.
+    string id = 1;
+    // Typology of the specific charging unit. 
+    ChargingUnitType type = 2;
+    // Information about the specific EV charging socket. 
+    repeated Socket sockets = 3;
+    // Information about the specific EV charging wireless pod. 
+    repeated WirelessPod wirelessPods = 4;
+    // Status of operation of the specific charging unit. 
+    Status status = 5;
+}
+
+message SwappingUnit {
+    message Pod {
+        // Unique identification number assigned to each swapping pod.
+        string id = 1;
+        // Typology of the specific baterry supported by the specific swapping unit. 
+        BatteryType batteryType = 2;
+    }
+
+    // Unique identification number assigned to each swapping unit.
+    string id = 1;
+    // Information about the specific EV charging pod at a battery swapping unit. 
+    repeated Pod pods = 2;
+    // Status of operation of the specific battery swapping unit. 
+    Status status = 3;
+}

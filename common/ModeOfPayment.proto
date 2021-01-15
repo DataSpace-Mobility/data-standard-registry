@@ -22,30 +22,11 @@
 
 syntax = "proto3";
 
-message Header {
-    // Version of the dataset.
-    string version = 1;
-  
-    // Determines whether the current fetch is incremental.
-    enum Incrementality {
-        UNKNOWN = 0;
-        FULL_DATASET = 1;
-        DIFFERENTIAL = 2;
-    }
-    Incrementality incrementality = 2;
-  
-    // This timestamp identifies the moment when the content of this feed has been
-    // created (time at the server). In POSIX time (i.e., number of seconds since
-    // January 1st 1970 00:00:00 UTC).
-    uint64 timestamp = 3;
-
-    // Publisher/Provider of the dataset.
-    Provider provider = 4;
-}
-
-message Provider {
-    // Unique identifier of the provider.
-    string id = 1;
-    // Name of the provider.
-    string name = 2;
+enum ModeOfPayment {
+    PAYMENT_UNKNOWN = 0;
+    PAYMENT_BANK_CARD = 1;
+    PAYMENT_CASH = 2;
+    PAYMENT_SMART_CARD = 3;
+    PAYMENT_COUPONS = 4;
+    PAYMENT_UPI = 5;
 }
