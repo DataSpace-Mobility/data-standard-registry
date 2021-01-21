@@ -115,7 +115,7 @@ message TrafficLane {
         }
         Turn turn = 3;
     }
-    Direction Direction = 3;
+    Direction direction = 3;
 
     // Type of modes that are allowed through a lane.
     enum ModeOfTransportAllowed {
