@@ -36,7 +36,7 @@ message OperatingSchedule {
 
     // Opening time
     string opening = 1;
-    // CLosing time.
+    // Closing time.
     string closing = 2;
     // Open day of the week.
     repeated DaysOfWeek dayOfWeek = 3;
