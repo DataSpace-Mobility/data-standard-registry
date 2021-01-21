@@ -35,10 +35,10 @@ message FeedMessage {
     Header header = 1;
 
     // Information about all the junctions in the system.
-    repeated Junction junction = 2;
+    repeated Junction junctions = 2;
 
     // Information on all the corridors.
-    repeated Corridor corridor = 3;
+    repeated Corridor corridors = 3;
 }
 
 // A Junction is a physical  point where at least two roads meet, hence traffic can change between different routes and/or directions at it.
@@ -68,10 +68,10 @@ message Junction {
         // Position of the junction within the corridor.
         uint32 sequenceNo = 3;
     }
-    repeated CorridorRelationship corridorRelationship = 5;
+    repeated CorridorRelationship corridorRelationships = 5;
     
     // Information on each carriageway inbound and outbound from the junction.
-    repeated Carriageway carriageway = 6;
+    repeated Carriageway carriageways = 6;
 }
 
 // Information about the Carriageway. A Carriageway is a set of TrafficLanes which follow a common direction in the beginning and then splits.
@@ -83,7 +83,7 @@ message Carriageway {
     // Location on the carriageway where traffic halts. Given by the latitude and longitude in deegres utilising the WGS-84 coordinate system.
     Location location  = 3;
     // Lane level information for the way.
-    repeated TrafficLane trafficLane = 4;
+    repeated TrafficLane trafficLanes = 4;
 }
 
 // A TrafficLane is a section of a carriageway that is designated (usually by lines of other physical barriers as bollards) to be used by a single line of vehicles to organise traffic and guide drivers
