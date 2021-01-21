@@ -28,7 +28,6 @@ package atcs_traffic_signal_realtime;
 option java_package = "in.gov.mohua.ds.transit";
 
 import "Header.proto";
-import "Location.proto";
 
 message FeedMessage {
     // Metadata
@@ -85,7 +84,7 @@ message TrafficLane {
         // Time in seconds available for the green signal. This can be equal to or more than the allocatedSeconds. It would exceed allocatedSeconds in a case where previous lanes (round robin manner) are under saturated (relatively free). Unoccupied time from the previous lane will be added to this time. 
         // 0 value means there is no data available.
         uint32 availableGreenSeconds = 2;
-        // Time in seconds for which this lane was utilised to clear the traffic. This will will never exceed the availableSeconds but it can be less than the availableSeconds if traffic density is low. In this case remaining time will be added to the availableSeconds of the next lane.
+        // Time in seconds for which this lane was utilised to clear the traffic. This will never exceed the availableSeconds but it can be less than the availableSeconds if traffic density is low. In this case remaining time will be added to the availableSeconds of the next lane.
         // This datapoint won't be available if the signal is green as the system is yet to compute the utilised time.
         // 0 value means there is no data available.
         uint32 utilisedGreenSeconds = 3;
