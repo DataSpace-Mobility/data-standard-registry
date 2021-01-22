@@ -140,5 +140,5 @@ message Corridor {
     // Name of the corridor.
     string corridorName = 2;
     // List of all junction IDs in the corridor.
-    repeated string junctionId = 3;
+    repeated string junctionIdsInCorridor = 3;
 }
