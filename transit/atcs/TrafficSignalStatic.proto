@@ -145,4 +145,6 @@ message Corridor {
     string corridorName = 2;
     // List of all junction IDs in the corridor.
     repeated string junctionIdsInCorridor = 3;
+    // Series of lat/lon points defining a corridor. It is an encoded polyline string. Refer to https://developers.google.com/maps/documentation/utilities/polylinealgorithm to know how to decode the string. to get a series of lat/lon points.
+    string shape = 4;
 }
