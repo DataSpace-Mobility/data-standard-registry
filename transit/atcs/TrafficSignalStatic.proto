@@ -91,7 +91,7 @@ message TrafficLane {
     string id = 1;
     // Position (ordered) of the lane in the junction. This value is with respect to the junction. Similar value for two lanes would mean that the traffic starts on them simultaneously.
     uint32 sequenceNo = 2;
-    // Series of lat/lon points defining a lane. Its is an encoded polyline string. Refer to https://developers.google.com/maps/documentation/utilities/polylinealgorithm to know how to decode the string. to get a series of lat/lon points.
+    // Series of lat/lon points defining a lane. It is an encoded polyline string. Refer to https://developers.google.com/maps/documentation/utilities/polylinealgorithm to know how to decode the string. to get a series of lat/lon points.
     string shape = 3;
 
     // Direction or change of direction permited for the vehicles at the TrafficLane.
