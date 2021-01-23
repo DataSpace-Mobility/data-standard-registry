@@ -45,8 +45,10 @@ message FeedMessage {
 message Junction {
     // Unique ID of the junction.
     string id = 1;
+    // Name of the junction.
+    string name = 2;
     // Aggregated time in seconds for green signal across all ways in that junction. 
-    uint32 maxCycleTimeSeconds = 2;
+    uint32 maxCycleTimeSeconds = 3;
 
     enum OperationMode {
         // Junction operation mode is not known.
@@ -55,10 +57,10 @@ message Junction {
         OPERATION_MODE_TIMER_FIXED = 1;
         OPERATION_MODE_FULL_VA_SPLIT = 2;
     }
-    OperationMode operationMode = 3;
+    OperationMode operationMode = 4;
 
     // Location of the controller installed at the junction.
-    Location location = 4;
+    Location location = 5;
 
     message CorridorRelationship {
         // ID of the corridor this junction is related to.
@@ -68,10 +70,10 @@ message Junction {
         // Position of the junction within the corridor.
         uint32 sequenceNo = 3;
     }
-    repeated CorridorRelationship corridorRelationships = 5;
+    repeated CorridorRelationship corridorRelationships = 6;
     
     // Information on each carriageway inbound and outbound from the junction.
-    repeated Carriageway carriageways = 6;
+    repeated Carriageway carriageways = 7;
 }
 
 // Information about the Carriageway. A Carriageway is a set of TrafficLanes which follow a common direction in the beginning and then splits.
