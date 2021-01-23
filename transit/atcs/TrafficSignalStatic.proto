@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// v0.0.1
+// v0.0.3
 
 syntax = "proto3";
 package atcs_traffic_signal_static;
@@ -78,12 +78,10 @@ message Junction {
 message Carriageway {
     // Unique ID for the way.
     string id = 1;
-    // Position (ordered) of the way in the junction. Traffic signal change will follow this order.
-    uint32 sequenceNo = 2;
-    // Location on the carriageway where traffic halts. Given by the latitude and longitude in deegres utilising the WGS-84 coordinate system.
-    Location location  = 3;
+    // Location on the carriageway where traffic halts. Given by the latitude and longitude in deegres utilising the WGS-84 coordinate system. For lane level stop points look at the location datapoint in TrafficLane. 
+    Location location  = 2;
     // Lane level information for the way.
-    repeated TrafficLane trafficLanes = 4;
+    repeated TrafficLane trafficLanes = 3;
 }
 
 // A TrafficLane is a section of a carriageway that is designated (usually by lines of other physical barriers as bollards) to be used by a single line of vehicles to organise traffic and guide drivers
@@ -91,8 +89,10 @@ message Carriageway {
 message TrafficLane {
     // Unique ID of the lane.
     string id = 1;
-    // Position (ordered) of the way in the junction. Traffic signal change will follow this order.
+    // Position (ordered) of the lane in the junction. This value is with respect to the junction. Similar value for two lanes would mean that the traffic starts on them simultaneously.
     uint32 sequenceNo = 2;
+    // Series of lat/lon points defining a lane. Its is an encoded polyline string. Refer to https://developers.google.com/maps/documentation/utilities/polylinealgorithm to know how to decode the string. to get a series of lat/lon points.
+    string shape = 3;
 
     // Direction or change of direction permited for the vehicles at the TrafficLane.
     message Direction {
@@ -115,22 +115,24 @@ message TrafficLane {
         }
         Turn turn = 3;
     }
-    Direction direction = 3;
+    Direction direction = 4;
 
     // Type of modes that are allowed through a lane.
     enum ModeOfTransportAllowed {
         // Motorised vehicles are allowed on this lane.
         MOTORISED = 0;
+        // Only buses are allowed on this lane.
+        BUS = 1;
         // Bicycles are allowed on this lane.
-        BICYCLE = 1;
+        BICYCLE = 2;
         // Pedestrians are allowed on this lane.
-        PEDESTRIAN = 2;
+        PEDESTRIAN = 3;
     }
     // Typology of vehicles allowed to circulate at the TrafficLane.
-    ModeOfTransportAllowed modeOfTransportAllowed = 4;
+    ModeOfTransportAllowed modeOfTransportAllowed = 5;
 
     // Location on the lane where traffic halts. Given by the latitude and longitude in deegres utilising the WGS-84 coordinate system.
-    Location location  = 5;
+    Location location  = 6;
 }
 
 // Corridor is a set of junctions. One junction can be part of multiple corridors.
