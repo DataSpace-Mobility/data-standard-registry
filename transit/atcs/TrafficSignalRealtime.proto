@@ -21,8 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// v0.0.1
-
 syntax = "proto3";
 package atcs_traffic_signal_realtime;
 option java_package = "in.gov.mohua.ds.transit";
@@ -76,6 +74,8 @@ message Carriageway {
 message TrafficLane {
     // Unique ID of the lane.
     string id = 1;
+    // Timestamp when data related to TrafficLane is updated.
+    uint64 updateTimestamp = 2;
     
     message SignalTiming {
         // Time in seconds allocated to the green signal for this lane. This is set manually by an operator. 
@@ -89,18 +89,24 @@ message TrafficLane {
         // 0 value means there is no data available.
         uint32 utilisedGreenSeconds = 3;
     }
-    SignalTiming signalTiming = 2;
+    SignalTiming signalTiming = 3;
 
     enum SignalStatus {
+        // Signal status unknown.
+        SIGNAL_UNKNOWN = 0;
         // Traffic can pass.
-        SIGNAL_GO = 0;
+        SIGNAL_GO = 1;
+        // Ready to stop or watch and go.
+        SIGNAL_AMBER = 2;
         // Traffic should stop at a designated place.
-        SIGNAL_STOP = 1;
+        SIGNAL_STOP = 3;
+        // Amber light is flashing. Traffic can proceed with caution.
+        SIGNAL_FLASHING = 4;
     }
     // Indicates if the traffic can pass or must stop.
-    SignalStatus signalStatus = 3;
+    SignalStatus signalStatus = 4;
 
-    OperationalStatus operationalStatus = 4;
+    OperationalStatus operationalStatus = 5;
 }
 
 // Corridor is a set of junctions. One junction can be part of multiple corridors.
@@ -120,6 +126,10 @@ enum OperationalStatus {
     STATUS_NORMAL_OPERATION = 1;
     // This entity is closed due to maintainance.
     STATUS_UNDER_MAINTAINANCE = 2;
+    // Signal(s) are flashing amber light. Traffic can proceed with caution. 
+    STATUS_AMBER_FLASHING = 3;
+    // Some of the signals are operational.
+    STATUS_PARTIALLY_CLOSED = 4;
     // This entity is closed due to unknown reason.
-    STATUS_CLOSED_OR_OFF = 3;
+    STATUS_CLOSED_OR_OFF = 5;
 }
