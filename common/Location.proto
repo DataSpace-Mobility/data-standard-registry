@@ -22,7 +22,14 @@
 
 syntax = "proto3";
 
+// GeoJSON Point Object representing a location.
 message Location {
-    float latitude = 1;
-    float longitude = 2;
+    enum Type {
+        // GeoJSON point type.
+        Point = 0;
+    }
+    // Type of GeoJSON object.
+    Type type = 1;
+    // Specifies latitude and longitude coordinates, list the longitude first and then latitude.
+    repeated float coordinates = 2;
 }
