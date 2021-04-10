@@ -35,7 +35,7 @@ message Header {
     Incrementality incrementality = 2;
   
     // This timestamp identifies the moment when the content of this feed has been
-    // created (time at the server). In POSIX time (i.e., number of seconds since
+    // created (time at the server). Milliseconds since Unix Epoch (i.e., number of milliseconds since
     // January 1st 1970 00:00:00 UTC).
     uint64 timestamp = 3;
 
