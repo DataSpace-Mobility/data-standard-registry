@@ -80,10 +80,12 @@ message Junction {
 message Carriageway {
     // Unique ID for the way.
     string id = 1;
+    // Name of the carriageway.
+    string name = 2;
     // Location on the carriageway where traffic halts. Given by the latitude and longitude in deegres utilising the WGS-84 coordinate system. For lane level stop points look at the location datapoint in TrafficLane. 
-    Location location  = 2;
+    Location location  = 3;
     // Lane level information for the way.
-    repeated TrafficLane trafficLanes = 3;
+    repeated TrafficLane trafficLanes = 4;
 }
 
 // A TrafficLane is a section of a carriageway that is designated (usually by lines of other physical barriers as bollards) to be used by a single line of vehicles to organise traffic and guide drivers
