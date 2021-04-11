@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// v0.0.1
+// v0.0.2
 
 syntax = "proto3";
 package ev_charging_realtime;
@@ -28,6 +28,8 @@ option java_package = "in.gov.mohua.ds.transit";
 
 import "Header.proto";
 import "BatteryType.proto";
+import "ModeOfPayment.proto";
+import "Alert.proto";
 
 message FeedMessage {
     // Metadata
@@ -39,70 +41,122 @@ message FeedMessage {
 
 message Station {
 
+    enum PodType {
+        POD_TYPE_UNKNOWN = 0;
+        POD_TYPE_WIRED_CHARGING = 1;
+        POD_TYPE_WIRELESS_CHARGING = 2;
+        POD_TYPE_BATTERY_SWAPPING = 3;
+    }
+
     message BatteryAvailability {
+        // Indicates the typology of battery(ies) available at the Station.
         BatteryType batteryType = 1;
+        // Number of total available battery(ies) of a specific batteryType at the station. 
         uint32 availableCount = 2;
     }
 
     message PodAvailability {
-        enum PodType {
-            POD_TYPE_UNKNOWN = 0;
-            POD_TYPE_WIRED_CHARGING = 1;
-            POD_TYPE_WIRELESS_CHARGING = 2;
-            POD_TYPE_BATTERY_SWAPPING = 3;
-        }
-
+        // Indicates the typology of pod(s) available at the Station.
         PodType podType = 1;
+        // Number of total available pod(s) a specific podType at the station. 
         uint32 availableCount = 2;
     }
 
+    // Information containing the different characteristics of a performed Transaction. 
     message Transaction {
         message DurationOfService {
+            // Identifies the moment when the Charging of a EV started. In POSIX time (i.e., number of milliseconds since January 1st 1970 00:00:00 UTC).
             uint64 startingTimeStamp = 1;
+            // Identifies the moment when the Charging of a EV finished. In POSIX time (i.e., number of milliseconds since January 1st 1970 00:00:00 UTC).
             uint64 endTimestamp = 2;
         }
 
         message ModeOfCharging {
+            // Indicates the typology of the EV ChargingUnit utilised during the Transaction. Please refer to the Static data standard.
             string unitType = 1;
+            // Indicates the typology of the EV WirelessPod utilised during the Transaction. Please refer to the Static data standard.
             string podType = 2;
+            // Indicates the unique identification number assigned to the EV ChargingUnit utilised during the Transaction. Please refer to the Static data standard.
             string unitId = 3;
+            // Indicates the unique identification number assigned to the EV WirelessPod utilised during the Transaction. Please refer to the Static data standard.
             string podId = 4;
         }
 
         message TransactionRate {
+            // Indicates the price (in Indian Rupees) charged to the user per consumed powerUnit (kWh) during the Transaction.
             float baseUnitPrice = 1;
+            // Identifies the amount (if any) paid by the user as a result of surcharge(s) applicable during the Transaction. Unit is Indian Rupees.
             float surcharge = 2;
+            // Identifies the amount (if any) paid by the user as a result of tax(es) applicable during the Transaction.  Unit is Indian Rupees.
             float taxes = 3;
+            // Identifies the amount (if any) saved by the user as a result of subsidy(ies) applicable during the Transaction.  Unit is Indian Rupees.
             float subsidy = 4;
+            // Identifies the final amount paid by the user per power unit consumed. Unit is Indian Rupees. Formula used: baseUnitPrice + surcharge + taxes + subsidy = pricePerUnit.
             float pricePerUnit = 5;
         }
 
+        // Unique identification number assigned to a Transaction. 
         string id = 1;
+        // Identifies the moment when the Transaction has been performed. In POSIX time (i.e., number of milliseconds since January 1st 1970 00:00:00 UTC).
         uint64 timestamp = 2;
+        // Indicates the total amount of power consumed at the Station at the specific point of time. The unit is kilowatt-hour (kWh).
         float powerConsumption = 3;
+        // Information about the amount of time required to perform the Transaction.
         DurationOfService durationOfService =  4;
+        // Information about the charging mode utilised during the Transaction. 
         ModeOfCharging modeOfCharging = 5;
-        ModeOfPayment usedModeOfPayment = 6;
-        
+        // Identifies the financial mechanism utilises by the user to pay the service provided during the Transaction. 
+        ModeOfPayment modeOfPaymentUsed = 6;
+        // Provides information about the structure utilised to calculate the final rate paid by the user for the performed Transaction. 
+        TransactionRate transactionRate = 7;
+    }
+
+    message ChargingUnit {
+        message Availability {
+            // Indicates the typology of pod(s) available at the Station.
+            PodType podType = 1;
+            // // Unique identification number assigned to the pod at the ChargingUnit. Please refer to the Static data standard.
+            string podId = 2;
+            // Identifies if the pod at the ChargingUnitis available. Valid options are: 0 - The pod is not available. 1 - The pod is available.
+            bool isPodAvailable = 3;
+        }
+        // Unique identification number assigned to the specific ChargingUnit. Please refer to the Static data standard.
+        string id = 1;
+        // Provides information about the availability of the ChargingUnit. 
+        repeated Availability availability = 2;
+        // List of alerts emitted.
+        repeated Alert alerts = 3;
+    }
+
+    message SwappingUnit {
+        message Availability {
+            // Indicates the typology of pod(s) available at the Station.
+            BatteryType batteryType = 1;
+            // // Unique identification number assigned to the pod at the ChargingUnit. Please refer to the Static data standard.
+            string podId = 2;
+            // Identifies if the pod at the ChargingUnitis available. Valid options are: 0 - The pod is not available. 1 - The pod is available.
+            bool isBatteryAvailable = 3;
+        }
+        // Unique identification number assigned to the specific ChargingUnit. Please refer to the Static data standard.
+        string id = 1;
+        // Provides information about the availability of the ChargingUnit. 
+        repeated Availability availability = 2;
+        // List of alerts emitted.
+        repeated Alert alerts = 3;
     }
 
 
 
     // Unique identification number assigned to the specific Station.
     string id  = 1;
-    // General information about the specific EV charging station. 
-    Info info = 2;
-    // Information about the total vehicle capacity by type supported at the 
-    // specific EV charging station.
-    repeated VehicleCapacity vehicleCapacity = 3;
-    // Location of the specific EV charging station.
-    Location location = 4;
-    // Operating schedule of the specific EV charging station.
-    OperatingSchedule operatingSchedule = 5;
-    // Status of operation of the specific EV charging station.
-    Status status = 6;
-    // Typology of vehicles allowed at the specific EV charging station.
-    repeated VehicleType allowedVehicleType = 7;
+    // Infomation about the availability of battery sets at the Station. 
+    repeated BatteryAvailability batteryAvailability = 2;
+    // Infomation about the availability of charging pods at the Station. 
+    repeated PodAvailability podAvailability = 3;
+    // List of transactions performed at the station.
+    repeated Transaction transactions = 4;
+    // List of alerts emitted.
+    repeated Alert alerts = 5;
     // Information about the specific charging unit. 
     repeated ChargingUnit chargingUnits = 8;
     // Information about the specific battery swapping unit. 
