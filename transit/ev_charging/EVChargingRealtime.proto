@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright (c) 2020 The Ministry of Housing and Urban Affairs
+// Copyright (c) 2020-2021 The Ministry of Housing and Urban Affairs
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,14 +72,10 @@ message Station {
         }
 
         message ModeOfCharging {
-            // Indicates the typology of the EV ChargingUnit utilised during the Transaction. Please refer to the Static data standard.
-            string unitType = 1;
-            // Indicates the typology of the EV WirelessPod utilised during the Transaction. Please refer to the Static data standard.
-            string podType = 2;
-            // Indicates the unique identification number assigned to the EV ChargingUnit utilised during the Transaction. Please refer to the Static data standard.
-            string unitId = 3;
-            // Indicates the unique identification number assigned to the EV WirelessPod utilised during the Transaction. Please refer to the Static data standard.
-            string podId = 4;
+            // Information about the charging mode utilised during the Transaction. 
+            PodType chargerType = 1;
+            // Indicates the unique identification number assigned to the charging unit utilised during the Transaction. Please refer to the Static data standard.
+            string id = 4;
         }
 
         message TransactionRate {
