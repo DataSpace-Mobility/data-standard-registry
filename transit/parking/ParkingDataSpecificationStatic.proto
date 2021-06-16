@@ -1,0 +1,360 @@
+// MIT License
+
+// Copyright (c) 2020-2021 The Ministry of Housing and Urban Affairs, GoI
+// Copyright (c) 2020-2021 National Institute of Urban Affairs
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// v0.0.1
+
+syntax = "proto3";
+package parking_specification_static;
+option java_package = "in.gov.mohua.ds.transit";
+
+import "Header.proto";
+import "Location.proto";
+import "VehicleType.proto";
+import "OperatingSchedule.proto";
+import "BatteryType.proto";
+import "SocketType.proto";
+
+message FeedMessage {
+    // Metadata
+    Header header = 1;
+
+    // Information about all the junctions in the system.
+    repeated ParkingComplex parkingComplexes = 2;
+}
+
+message ParkingComplex {
+
+    message VehicleCapacity {
+        VehicleType vehicleType = 1;
+        uint32 count = 2;
+    }
+
+    message Information {
+
+        message Operator {
+            // Unique identification number of the operator of the parking complex.
+            string id = 1;
+            // Name of the operator of the parking complex.
+            string name = 2;
+            // Phone number of the operator of the parking complex.
+            string phone = 3;
+            // Email ID of the operator of the parking complex.
+            string email = 4;
+        }
+
+        message Owner {
+            // Unique identification number of the owner of the parking complex.
+            string id = 1;
+            // Name of the owner of the parking complex.
+            string name = 2;
+        }
+
+        // Name of the parking complex.
+        string name = 1;
+        // Address of the parking complex.. 
+        string address = 2;
+        // URL of the image of the parking complex.
+        repeated string imageUrls = 3;
+        // Location of the parking complex.
+        Location location = 4;
+        // Operator of the parking complex.
+        Operator operator = 6;
+        // Owner of the parking complex.
+        Owner owner = 7;
+    }
+
+    message ParkingLot {
+
+        message Infrastructure {
+
+            enum BuildingType {
+                BUILDING_TYPE_UNKNOWN = 0;
+            }
+
+            enum SurfaceType {
+                SURFACE_TYPE_UNKNOWN = 0;
+            }
+
+            message Gate {
+                enum Access {
+                    // The operation of the specific Gate is not known / specified. 
+                    ACCESS_UNKNOWN = 0;
+                    // The specific Gate is only for entry.
+                    ACCESS_ENTRY_ONLY = 1;
+                    // The specific Gate is only for exit
+                    ACCESS_EXIT_ONLY = 2;
+                    // The specific Gate is for both, entry and exit. 
+                    ACCESS_ENTRY_EXIT  =3;
+                }
+
+                message AccessDimension {
+                    // Maximum permisible height at the specific Gate.
+                    float maxHeight = 1;
+                    // Maximum permisible width at the specific Gate.
+                    float maxWidth = 2;
+                    // Maximum ramp slope at the specific Gate.
+                    float maxSlope = 3;
+                }
+
+                // Unique identification number of the specific Gate of a parking lot. 
+                string id = 1;
+                // Exact geoposition of a specific Gate at a parking lot.
+                Location location = 2;
+                // Information about the Access operation status of the specific Gate of a  parking lot. 
+                Access access = 3;
+                // Information about maximum dimensions supported at the specific Gate of a parking lot. 
+                AccessDimension accessDimension = 4;
+            }
+
+            // Total area of the parking lot.
+            float buildArea = 1;
+            // Typology of building of the parking lot.
+            BuildingType buildingType = 2;
+            // Ground surface cover at the parking lot.
+            SurfaceType surfaceType = 3;
+            // Entry gate(s) available at the parking lot.
+            repeated Gate gates = 4;
+        }
+
+        message Policy {
+
+            enum ParkingManagementType {
+                // The ParkingManagement system at the specific ParkingLot is not known / specified.
+                PARKING_MANAGEMENT_TYPE_UNKNOWN = 0;
+                // An automated ParkingManagement system is utilised at the specific ParkingLot.
+                PARKING_MANAGEMENT_TYPE_AUTOMATED = 1;
+                // A semiautomated ParkingManagement system is utilised at the specific ParkingLot.
+                PARKING_MANAGEMENT_TYPE_SEMIAUTOMATED = 2;
+                // A manual ParkingManagement system is utilised at the specific ParkingLot.
+                PARKING_MANAGEMENT_TYPE_MANUAL = 3;
+                // Any other ParkingManagement system is utilised at the specific ParkingLot.
+                PARKING_MANAGEMENT_TYPE_OTHER = 4;
+            }
+
+            // Specifies if the parking lot has a goverment authorization to operate. 
+            bool isAuthorisedByGovt = 1;
+            // Maximum allowed parking duration at the specific parking lot. 
+            uint32 maxParkingDuration = 2;
+            // Specifies if over night parking is allowed at the specific parking lot. 
+            bool isOvernightParkingAllowed = 3;
+            // Information on operation mechanism of the parking lot.
+            ParkingManagementType parkingManagementType = 4;
+            // Operating schedule of the parking lot.
+            OperatingSchedule operatingSchedule = 5;
+        }
+
+        enum SecurityFeature {
+            // Security feature of the parking lot is not known.
+            SECURITY_FEATURE_UNKNOWN = 0;
+            // The specific ParkingLot is patrolled as a security mechanism.
+            SECURITY_FEATURE_PATROLLED = 1;
+            // The specific ParkingLot has external security. 
+            SECURITY_FEATURE_EXTERNAL_SECURITY = 2;
+            // The specific ParkingLot has CCTV system(s) as a security mechanism.
+            SECURITY_FEATURE_CCTV = 3;
+            // The specific ParkingLot has lighting as a security mechanism.
+            SECURITY_FEATURE_LIGHTING = 4;
+            // The specific ParkingLot has fence(s) as a security mechanism.
+            SECURITY_FEATURE_FENCES = 5;
+        }
+
+        message ParkingSpot {
+
+            message ChargingUnit {
+                // Unique identification number of the ChargingUnit available at a ParkingSpot. 
+                string id = 1;
+                // Type of batteries available at the parking spot.
+                repeated BatteryType batteryTypeAvailable = 2;
+                // Type of charging socket available at the parking spot.
+                repeated SocketType socketTypeAvailable = 3;
+            }
+
+            enum Accessibility {
+                // Accessibility is not known.
+                ACCESSIBILITY_UNKNOWN = 0;
+                // The specific ParkingSpot is wheelchair accesible. 
+                ACCESSIBILITY_WHEELCHAIR = 1;
+                // The specific ParkingSpot has an elevator nearby. 
+                ACCESSIBILITY_NEARBY_ELEVATOR = 2;
+                // The specific ParkingSpot has a ramp nearby. 
+                ACCESSIBILITY_RAMP = 3;
+            }
+
+            enum ReservationType {
+                // Reservation type is not known.
+                RESERVATION_TYPE_UNKNOWN = 0;
+                // The specific ParkingSpot can be reserved. 
+                RESERVATION_TYPE_OPTIONAL = 1;
+                // The specific ParkingSpot must be reserved. 
+                RESERVATION_TYPE_MANDATORY = 2;
+                // The specific ParkingSpot cannot be reserved. 
+                RESERVATION_TYPE_NOT_AVAILABLE = 3;
+            }
+
+            enum ReservedFor {
+                // It is unknown for which category this spot is reserved for.
+                RESERVED_FOR_UNKNOWN = 0;
+                // The specific ParkingSpot is not reserved. 
+                RESERVED_FOR_NONE = 1;
+                // The specific ParkingSpot is reserved for employees. 
+                RESERVED_FOR_EMPLOYEES = 2;
+                // The specific ParkingSpot is reserved for students. 
+                RESERVED_FOR_STUDENTS = 3;
+                // The specific ParkingSpot is reserved for government officials. 
+                RESERVED_FOR_GOVERNMENT_OFFICIALS = 4;
+                // The specific ParkingSpot is reserved for residents.
+                RESERVED_FOR_RESIDENTS = 5;
+                // The specific ParkingSpot is reserved for visitors. 
+                RESERVED_FOR_VISITORS = 6;
+                // The specific ParkingSpot is reserved for other user(s). 
+                RESERVED_FOR_OTHERS = 7;
+            }
+
+            enum OccupancyDetectionMethod {
+                // The OccupancyDetectionMethod at the specific ParkingSpot is not known / specified. 
+                OCCUPANCY_DETECTION_METHOD_UNKNOWN = 0;
+                // The OccupancyDetectionMethod at the specific ParkingSpot is manual. 
+                OCCUPANCY_DETECTION_METHOD_MANUAL = 1;
+                // The OccupancyDetectionMethod at the specific ParkingSpot is automated.
+                OCCUPANCY_DETECTION_METHOD_AUTOMATED = 2;
+                // The OccupancyDetectionMethod at the specific ParkingSpot is other. 
+                OCCUPANCY_DETECTION_METHOD_OTHER = 3;
+            }
+
+            // Unique identification number of the specific ParkingSpot.
+            string id = 1;
+            // Level in which the specific ParkingSpot is located. Ground is 0, first basement is -1 etc.
+            int32 level = 2;
+            // Information on EV charging unit if avaailable at the parking spot.
+            ChargingUnit chargingUnit = 3;
+            // Geoposition of the ParkingSpot. 
+            Location location = 4;
+            // Typology of vehicle(s) allowed at the specific ParkingSpot.
+            repeated VehicleType allowedVehicleType = 5;
+            repeated Accessibility accessibility = 6;
+            ReservationType reservationType = 7;
+            repeated ReservedFor reservedFor = 8;
+            OccupancyDetectionMethod occupancyDetectionMethod = 9;
+        }
+
+        // Unique identification number of the operator of the parking lot.
+        string id = 1;
+        Infrastructure infrastructure = 2;
+        repeated VehicleCapacity vehicleCapacity = 3;
+        Policy policy = 4;
+        SecurityFeature securityFeature = 5;
+    }
+
+    message Tariff {
+
+        enum TariffType {
+            TARIFF_TYPE_UNKNOWN = 0;
+            TARIFF_TYPE_FIXED = 1;
+            TARIFF_TYPE_DYNAMIC = 2;
+            TARIFF_TYPE_HYBRID = 3;
+        }
+
+        enum TariffCalculationMethod {
+            TARIFF_CALCULATION_METHOD_ADDITIVE = 0;
+            TARIFF_CALCULATION_METHOD_NON_ADDITIVE = 1;
+        }
+
+        enum TariffUnit {
+            TARIFF_UNIT_UNKNOWN = 0;
+            TARIFF_UNIT_MINUTE = 1;
+            TARIFF_UNIT_HOUR = 2;
+            TARIFF_UNIT_DAY = 3;
+            TARIFF_UNIT_WEEK = 4;
+            TARIFF_UNIT_MONTH = 5;
+            TARIFF_UNIT_NIGHT = 6;
+        }
+
+        message ApplicabilityRange {
+            float fromUnit = 1;
+            float toUnit = 2;
+        }
+
+        message FixedTariff {
+            message PricingModel {
+                float fromUnit = 1;
+                float toUnit = 2;
+                float price = 3;
+            }
+
+            TariffUnit tariffUnit = 1;
+            repeated PricingModel pricingModel = 2;
+            repeated ApplicabilityRange applicabilityRange = 3;
+        }
+
+        message DynamicTariff {
+            float pricePerUnit = 1;
+            TariffUnit tariffUnit = 2;
+            repeated ApplicabilityRange applicabilityRange = 3;
+        }
+
+        message NightTariff {
+            message NightTiming {
+                string from = 1;
+                string to = 2;
+            }
+
+            float pricePerUnit = 1;
+            TariffUnit tariffUnit = 2;
+            NightTiming nightTiming = 3;
+        }
+
+        message Pass {
+            float pricePerUnit = 1;
+            TariffUnit tariffUnit = 2;
+        }
+
+        message Penalty {
+            enum PenaltyType {
+                PENALTY_TYPE_UNKNOWN = 0;
+                PENALTY_TYPE_TICKET_LOST = 1;
+                PENALTY_TYPE_TIME_OVERSHOOT = 2;
+                PENALTY_TYPE_ILLEGAL_SPOT = 3;
+            }
+
+            float price = 1;
+            PenaltyType penaltyType = 2;
+        }
+
+        string parkingType = 1;
+        VehicleType vehicleType = 2;
+        TariffType tariffType = 3;
+        TariffCalculationMethod tariffCalculationMethod = 4;
+        FixedTariff fixedTariff = 5;
+        DynamicTariff dynamicTariff = 6;
+        NightTariff nightTariff = 7;
+        Pass pass = 8;
+        repeated Penalty penalty = 9;
+    }
+
+    string id = 1;
+    Information information = 2;
+    // Vehicle capacity at the parking complex.
+    repeated VehicleCapacity vehicleCapacity = 3;
+    repeated ParkingLot parkinglots = 4;
+    repeated Tariff tariffs = 5;
+}
