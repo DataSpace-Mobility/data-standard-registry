@@ -32,6 +32,7 @@ import "ModeOfPayment.proto";
 import "Location.proto";
 import "VehicleType.proto";
 import "BatteryType.proto";
+import "SocketType.proto";
 
 message FeedMessage {
     // Metadata
@@ -114,32 +115,6 @@ message ChargingUnit {
     }
 
     message Socket {
-        enum SocketType {
-            // The specific socket is not known / specified. 
-            CHARGING_UNIT_SOCKET_TYPE_UNKNOWN = 0;
-
-            CHARGING_UNIT_SOCKET_TYPE_BEVC_AC001 = 1;
-
-            CHARGING_UNIT_SOCKET_TYPE_BEVC_DC001 = 2;
-            // The specific socket is TYPE2.
-            CHARGING_UNIT_SOCKET_TYPE_TYPE2 = 3;
-            CHARGING_UNIT_SOCKET_TYPE_TYPE3 = 4;
-            CHARGING_UNIT_SOCKET_TYPE_CHADEMO = 5;
-            CHARGING_UNIT_SOCKET_TYPE_CCS_SAE = 6;
-            CHARGING_UNIT_SOCKET_TYPE_CCS1 = 7;
-            CHARGING_UNIT_SOCKET_TYPE_CCS2 = 8;
-            CHARGING_UNIT_SOCKET_TYPE_TESLA = 9;
-            CHARGING_UNIT_SOCKET_TYPE_J_1772 = 10;
-            CHARGING_UNIT_SOCKET_TYPE_WALL_EURO = 11;
-            CHARGING_UNIT_SOCKET_TYPE_CARAVAN_MAINS_SOCKET = 12;
-            CHARGING_UNIT_SOCKET_TYPE_DUAL_J_1772 = 13;
-            CHARGING_UNIT_SOCKET_TYPE_DUAL_CHADEMO = 14;
-            CHARGING_UNIT_SOCKET_TYPE_MENNEKES = 15;
-            CHARGING_UNIT_SOCKET_TYPE_DUAL_MENNEKES = 16;
-            CHARGING_UNIT_SOCKET_TYPE_GB_T = 17;
-            CHARGING_UNIT_SOCKET_TYPE_OTHER = 18;
-        }
-
         // Unique identifier of charging socket or gun.
         string id = 1;
         // Typology of the specific socket. 

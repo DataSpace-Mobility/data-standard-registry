@@ -1,0 +1,49 @@
+// MIT License
+
+// Copyright (c) 2020-2021 The Ministry of Housing and Urban Affairs
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+syntax = "proto3";
+
+enum SocketType {
+    // The specific socket is not known / specified. 
+    CHARGING_UNIT_SOCKET_TYPE_UNKNOWN = 0;
+
+    CHARGING_UNIT_SOCKET_TYPE_BEVC_AC001 = 1;
+
+    CHARGING_UNIT_SOCKET_TYPE_BEVC_DC001 = 2;
+    // The specific socket is TYPE2.
+    CHARGING_UNIT_SOCKET_TYPE_TYPE2 = 3;
+    CHARGING_UNIT_SOCKET_TYPE_TYPE3 = 4;
+    CHARGING_UNIT_SOCKET_TYPE_CHADEMO = 5;
+    CHARGING_UNIT_SOCKET_TYPE_CCS_SAE = 6;
+    CHARGING_UNIT_SOCKET_TYPE_CCS1 = 7;
+    CHARGING_UNIT_SOCKET_TYPE_CCS2 = 8;
+    CHARGING_UNIT_SOCKET_TYPE_TESLA = 9;
+    CHARGING_UNIT_SOCKET_TYPE_J_1772 = 10;
+    CHARGING_UNIT_SOCKET_TYPE_WALL_EURO = 11;
+    CHARGING_UNIT_SOCKET_TYPE_CARAVAN_MAINS_SOCKET = 12;
+    CHARGING_UNIT_SOCKET_TYPE_DUAL_J_1772 = 13;
+    CHARGING_UNIT_SOCKET_TYPE_DUAL_CHADEMO = 14;
+    CHARGING_UNIT_SOCKET_TYPE_MENNEKES = 15;
+    CHARGING_UNIT_SOCKET_TYPE_DUAL_MENNEKES = 16;
+    CHARGING_UNIT_SOCKET_TYPE_GB_T = 17;
+    CHARGING_UNIT_SOCKET_TYPE_OTHER = 18;
+}
