@@ -34,9 +34,9 @@ message OperatingSchedule {
         DAY_SATURDAY = 7;
     }
 
-    // Opening time
+    // Opening time. Format: HH:MM:SS in 24-hour format.
     string opening = 1;
-    // Closing time.
+    // Closing time. Format: HH:MM:SS in 24-hour format.
     string closing = 2;
     // Open day of the week.
     repeated DaysOfWeek dayOfWeek = 3;
